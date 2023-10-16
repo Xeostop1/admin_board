@@ -1,0 +1,78 @@
+
+
+배너가 전체 가지고있고 
+up랑 dir 군번 dir 코드 가지고 있음 여기서 가지고 와서 사용 
+
+캡션에는 캡션정보
+배너 pcs는 배너 id랑 
+
+sec
+업데이트 날짜만 정리
+
+
+채팅 시작 후 자동 응답 2  점심시간임. 점심시간 안내하거나 뭐 그런식으로 하면 되지 않을까?
+
+
+- 브랜드페이 사용경험
+1. 네이버
+- 네이버페이(간편결제)
+- 카드 등록 후 결제 비밀번호 입력
+- 네이버 포인트 추가적립
+2. 펫프렌즈
+- 내통장결제 30% 소득공제, 0.3%추가 적립
+- 휴대폰번호로 로그인 후 통장에서 직접 인출 
+-010pay 사용  (주)헥토파이낸셜
+
+deepL에서 node.js 
+
+
+나는 DeepL OpenAPI를 사용하고 싶은데, 
+js에 사용하려면 어떻게 해야해?
+
+
+[title_eng] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+비교할때 Korean_Wansung_CI 이 null이 아니라면 
+이 부분은 한국어 완성형 인코딩(Korean_Wansung_CI)
+CI Case Insensitive 대소문자 구분, x 
+AS Accent Sensitive 액센트(특수 부호)를 구분함
+
+noti_id : 프라이머리 이걸로 구분함
+[title]  : varchar(한국어)
+[title_eng] : varchar(영어)
+[title_chn] : nvarchar(중어)
+[title_jpn] : nvarchar(일어)
+[sub_title] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+[sub_title_eng]
+[sub_title_chn]
+[sub_title_jpn]
+[mail_body]
+[mail_body_eng]
+mail_body_chn
+mail_body_jpn
+lms_body
+kakao_body
+sysdate: 업데이트 날짜
+due_date: 보낼날짜
+due: 보낼날짜 예약시간
+mail_flag: 0/1
+lms_flag
+fcm_flag :push 플래그 
+kakao_flag
+sent_date: 진짜 보낸 날짜
+results 로그기록 
+
+신경써야 할것! 
+1. 작성시 noti_id 확인 필(위에서 체크해서 업데이트랑 insert into 분기)
+2. update시 수정할 수 있게 벨류값 가져오기
+3. 넣을 때 4개 국어 all 수정할 수 있게 세팅 
+5. 4개 모두 플래그 꼭 확인하기(체크박스로 all 체킹하고 필요 없는것만 푸르기)
+6. due_date 시간 받기(나머지는 기능이니까 예약기능이라고 생각)같이 
+7. due 시간만 확인하고 date에서 앞에 시간만 가져와서 체킹하고 그게 맞으면 
+ 정각에 보내거나, 30분에 보내거나 할 수 있게 세팅(1~6 정도 생각)
+8.실제 보낸 시간 가져오기 
+
+***************************
+get_에서 쓰고 확인
+set_noti_info로 보내고
+리스트는 전체 글 보기 
+
