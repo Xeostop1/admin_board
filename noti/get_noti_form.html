@@ -1,0 +1,131 @@
+<!--#include virtual=/sb/inc/vbutil.inc-->
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="http://mdev.gvg.co.kr/css/master.css" />
+    <link
+      rel="stylesheet"
+      href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="http://mdev.gvg.co.kr/css/datatables.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <style>
+      .table_datagrid td {
+        text-align: left;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/datatables.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/fixeddatatable.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/jquery.form.js"
+    ></script>
+    <script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
+    <script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
+    <script>
+      function fnSubmit() {
+        alert("fnSubmit() 체크중");
+        // fnPreSubmit 사용해서 필수필드 확인
+        // 후 Submit 합니다. action = set_noti_info.html
+      }
+    </script>
+  </head>
+
+  <body>
+    <ul class="manual">
+      <li>tb_noti_master 에 기본정보 입력화면 구성</li>
+      <li>*_flag 필드는 1/0 1:발송 0:제외</li>
+      <li>
+        due_date: 발송일 지정, due 발송차수 지정 1~6 (차수별 발송시간은
+        차후설정)
+      </li>
+    </ul>
+    <pre>
+				[noti_id] numeric(18,0) IDENTITY(1,1) NOT NULL,
+				[title] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+				[title_eng] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+				[title_chn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
+				[title_jpn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
+				[sub_title] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+				[sub_title_eng] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
+				[sub_title_chn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
+				[sub_title_jpn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
+				[mail_body] varchar(2000) COLLATE Korean_Wansung_CI_AS NULL,
+				[mail_body_eng] varchar(2000) COLLATE Korean_Wansung_CI_AS NULL,
+				[mail_body_chn] nvarchar(4000) COLLATE Korean_Wansung_CI_AS NULL,
+				[mail_body_jpn] nvarchar(4000) COLLATE Korean_Wansung_CI_AS NULL,
+				[lms_body] varchar(1000) COLLATE Korean_Wansung_CI_AS NULL,
+				[kakao_body] varchar(1000) COLLATE Korean_Wansung_CI_AS NULL,
+				[sysdate] datetime NULL DEFAULT (getdate()),
+				[due_date] date NULL,
+				[due] int NULL,
+				[mail_flag] int NULL,
+				[lms_flag] int NULL,
+				[fcm_flag] int NULL,
+				[kakao_flag] int NULL,
+				[sent_date] datetime NULL,
+				[results] varchar(200) COLLATE Korean_Wansung_CI_AS NULL
+			</pre
+    >
+    <h1>NEW NOTIFICATION</h1>
+    <% 
+    sql = "SELECT * FROM tb_noti_master" 
+    set rs=getRs(sql)
+    Response.Write("<p>쿼리: " & sql & "</p>")
+    Response.Write("<p>coment 필드명 왜 못가져와요??? </p>")
+    
+    Response.Write "<br><table class='table_datagrid'>"
+    Response.Write "<tr>"
+
+    If Not rs.EOF Then
+    '제목
+      For i = 0 To rs.Fields.Count - 1
+          Response.Write "<th>" & rs.Fields(i).Name & "</th>"
+      Next
+      Response.Write "</tr><tr>"
+
+      ' 인풋
+      For i = 0 To rs.Fields.Count - 1
+          Response.Write "<td><input type='text' class='mustinput' title='제목은 반드시 입력' placeholder='제목은 반드시 입력'></td>"
+      Next
+      Response.Write "</tr>"
+      Response.Write "</table>"
+    End If
+    %>
+
+    <form id="formNoti">
+    <input type="hidden" value="<%=noti_id%>">
+      <table class="table_datagrid">
+        <tr>
+          <th>제목</th>
+          <td> <input type="text" class="mustinput" title="제목은 반드시 입력" placeholder="제목은 반드시 입력"/></td>
+        </tr>
+        <tr>
+          <th>서브타이틀</th>
+          <td> <input type="text" class="mustinput" title="제목은 반드시 입력" placeholder="제목은 반드시 입력"/></td>
+        </tr>
+      </table>
+      <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
+    </form>
+    <script></script>
+  </body>
+</html>
