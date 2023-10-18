@@ -3,34 +3,6 @@
 <%
   Response.CodePage = 65001
   Response.CharSet = "utf-8"
-
-  ' noti_id = Request.QueryString("noti_id")
-  ' title = Request.QueryString("title")
-  ' title_eng = Request.QueryString("title_eng")
-  ' title_chn = Request.QueryString("title_chn")
-  ' title_jpn = Request.QueryString("title_jpn")
-  ' sub_title = Request.QueryString("sub_title")
-  ' sub_title_eng = Request.QueryString("sub_title_eng")
-  ' sub_title_jpn = Request.QueryString("sub_title_jpn")
-  ' sub_title_chn = Request.QueryString("sub_title_chn")
-  ' mail_body = Request.QueryString("mail_body")
-  ' mail_body_eng = Request.QueryString("mail_body_eng")
-  ' sub_title = Request.QueryString("title")
-  ' mail_body_chn = Request.QueryString("mail_body_chn")
-  ' mail_body_jpn = Request.QueryString("mail_body_jpn")
-  ' lms_body = Request.QueryString("lms_body")
-  ' kakao_body = Request.QueryString("kakao_body")
-  ' due = Request.QueryString("due")
-  ' mail_flag = Request.QueryString("mail_flag")
-  ' lms_flag = Request.QueryString("lms_flag")
-  ' fcm_flag = Request.QueryString("fcm_flag")
-  ' kakao_flag = Request.QueryString("kakao_flag")
-  ' sent_date = Request.QueryString("sent_date")
-  ' results = Request.QueryString("results")
-  ' due_date = Request.QueryString("due_date")
-  ' admin_id = Request.QueryString("admin_id")
-
-  
 %>
 <html>
   <head>
@@ -127,63 +99,23 @@
     
     sql = "DELETE FROM tb_noti_master WHERE noti_id = " & noti_id  
 
-    ' sql_add= "INSERT INTO tb_noti_master (title) VALUES ('" & title & "')"
+    
     Set conn = Server.CreateObject("ADODB.Connection")
     conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
     conn.Open
-    ' delte
+    
     Set cmd = Server.CreateObject("ADODB.Command")
       cmd.ActiveConnection = conn
       cmd.CommandText = sql
       cmd.Execute
-    
-    ' insert
-    ' Set cmd_insert= Server.CreateObject("ADODB.Command")
-    '   cmd_insert.ActiveConnection= conn
-    '   cmd_insert.CommandText= sql_add 
-    '   cmd_insert.Execute 
-
-
     conn.Close
     Set conn = Nothing 
-
-
-
-
-  title = Request.Form("title")
-  title_eng = Request.Form("title_eng")
-  title_chn = Request.Form("title_chn")
-  title_jpn = Request.Form("title_jpn")
-  sub_title = Request.Form("sub_title")
-  sub_title_eng = Request.Form("sub_title_eng")
-  sub_title_jpn = Request.Form("sub_title_jpn")
-  sub_title_chn = Request.Form("sub_title_chn")
-  mail_body = Request.Form("mail_body")
-  mail_body_eng = Request.Form("mail_body_eng")
-  sub_title = Request.Form("title")
-  mail_body_chn = Request.Form("mail_body_chn")
-  mail_body_jpn = Request.Form("mail_body_jpn")
-  lms_body = Request.Form("lms_body")
-  kakao_body = Request.Form("kakao_body")
-  due = Request.Form("due")
-  mail_flag = Request.Form("mail_flag")
-  lms_flag = Request.Form("lms_flag")
-  fcm_flag = Request.Form("fcm_flag")
-  kakao_flag = Request.Form("kakao_flag")
-  sent_date = Request.Form("sent_date")
-  results = Request.Form("results")
-  due_date = Request.Form("due_date")
-  admin_id = Request.Form("admin_id")
-
-
 %>
 
       
     </form>
     <script>        
      function fnSubmit() {
-        
-
         $("#formNoti").submit();
         
         // fnPreSubmit 사용해서 필수필드 확인

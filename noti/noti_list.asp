@@ -4,46 +4,6 @@
   Response.CodePage = 65001
   Response.CharSet = "utf-8"
 
- 'title_eng = Request.QueryString("noti_id")
- 
-  
-  'title = Request.Form("title")
-
-'   Response.Write ("<h2> title: "& title  &"</h2>")
-'   Response.Write ("<h2> noti_id: "& noti_id  &"</h2>")
-'   Response.Write ("<h2> noti_id_get:"& noti_id_get  &"</h2>")
-
-'   title_eng = Request.Form("title_eng")
-'   title_chn = Request.Form("title_chn")
-'   title_jpn = Request.Form("title_jpn")
-'   sub_title = Request.Form("sub_title")
-'   sub_title_eng = Request.Form("sub_title_eng")
-'   sub_title_jpn = Request.Form("sub_title_jpn")
-'   sub_title_chn = Request.Form("sub_title_chn")
-'   mail_body = Request.Form("mail_body")
-'   mail_body_eng = Request.Form("mail_body_eng")
-'   sub_title = Request.Form("title")
-'   mail_body_chn = Request.Form("mail_body_chn")
-'   mail_body_jpn = Request.Form("mail_body_jpn")
-'   lms_body = Request.Form("lms_body")
-'   kakao_body = Request.Form("kakao_body")
-'   due = Request.Form("due")
-'   mail_flag = Request.Form("mail_flag")
-'   lms_flag = Request.Form("lms_flag")
-'   fcm_flag = Request.Form("fcm_flag")
-'   kakao_flag = Request.Form("kakao_flag")
-'   sent_date = Request.Form("sent_date")
-'   results = Request.Form("results")
-'   due_date = Request.Form("due_date")
-'   admin_id = Request.Form("admin_id")
-
-
-'noti_id = Replace(noti_id, " ", "")
-'왜 자꾸 숫자로 안넘어와??
-'noti_id = CInt(noti_id)
-'noti_id=19
-
-
 %>
 <html>
 	<head>
@@ -92,19 +52,6 @@
 			<a class="btn5 biggest" onclick=addData();>ADD</a>
 			
             <%
-
-			' GET 요청 처리
-			' If Request.ServerVariables("REQUEST_METHOD") = "GET" Then
-			' 	value = Request.QueryString("key")
-			' 	Response.Write ("<h1>value / QueryString "& value &"</h1>")
-			' End If
-			' ' POST 요청 처리
-			' If Request.ServerVariables("REQUEST_METHOD") = "POST" Then
-			' 	value = Request.Form("key")
-			' 	Response.Write ("<h1>value / Form "& value &"</h1>")
-			' End If
-
-
 			 sql = "SELECT * FROM tb_noti_master ORDER BY noti_id DESC" 
 			set rs=getRs(sql)
 			'Response.Write("<p>쿼리: " & sql & "</p>")
@@ -135,6 +82,7 @@
 				conn.Open
 
 			If action = "set" Then 
+				Response.Write ("<h1>"& action &"</h1>")
 			 	Response.Write("<p>set action</p>")
 				sql1= "INSERT INTO tb_noti_master (title) VALUES ('" & title & "')"
 				Response.Write ("<h2> SQL: "& sql1 &"</h2>")
@@ -143,6 +91,7 @@
 				cmd_insert.ActiveConnection= conn
 				cmd_insert.CommandText= sql1
 				cmd_insert.Execute 
+				Response.Redirect("noti_list.asp")
 
 			ElseIf action = "del" Then
 				Response.Write("<p>del action</p>")
@@ -157,7 +106,6 @@
 
 			ElseIf action = "update, update" Then
 			 	Response.Write("<p>update action</p>")
-				Response.Write ("<h1>"& action &"</h1>")
 				sql1 = "UPDATE tb_noti_master SET title = '" & title & "' WHERE noti_id = " & noti_id 
 				Response.Write("<p>sql1: " & sql1 & "</p>")
 				Set conn = Server.CreateObject("ADODB.Connection")
@@ -180,9 +128,5 @@
 			Response.Write ("<h1>"& action &"</h1>")
 			
 			%>
-<script>        
-
-    </script>
-			
 		</body>
 </html>
