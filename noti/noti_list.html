@@ -1,11 +1,10 @@
-<% @Language=VBScript CodePage=65001%>
+<%@Language=VBScript CodePage=65001%>
 <!--#include virtual=/sb/inc/vbutil.inc-->
 <%
   Response.CodePage = 65001
   Response.CharSet = "utf-8"
 
  title_eng = Request.QueryString("noti_id")
-
   noti_id = Request.Form("noti_id")
   title = Request.Form("title")
   title_eng = Request.Form("title_eng")
@@ -32,6 +31,30 @@
   due_date = Request.Form("due_date")
   admin_id = Request.Form("admin_id")
 
+noti_id = Replace(noti_id, ",", "")
+noti_id = Replace(noti_id, " ", "")
+noti_id = CInt(noti_id)
+Response.Write("<p>noti_id???:" & noti_id & "</p>")
+Response.Write("<p>title: " & title & "</p>")
+
+
+sql1 = "UPDATE tb_noti_master SET " &_
+"title = '" & title & "'"
+sql1 = sql1  & " WHERE noti_id = " & noti_id 
+ 
+ Response.Write("<p>sql1: " & sql1 & "</p>")
+Dim conn
+Set conn = Server.CreateObject("ADODB.Connection")
+
+' 데이터베이스 연결 설정
+conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
+conn.Open
+Set cmd = Server.CreateObject("ADODB.Command")
+cmd.ActiveConnection = conn
+cmd.CommandText = sql1
+cmd.Execute
+'conn.Close
+'conn=Nothing
 
 
 %>

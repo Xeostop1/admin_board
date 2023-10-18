@@ -115,17 +115,20 @@
     sql = "SELECT * FROM tb_noti_master WHERE noti_id = "& noti_id
     set rs=getRs(sql)
     Response.Write("<p>쿼리: " & sql & "</p>")          
-    	Response.Write "<br><table class='table_datagrid'>"
+    Response.Write "<form id='formNoti' method='post' action='noti_list.html'>"
+    Response.Write "<br><table class='table_datagrid'>"
 				'여기는 와일에 for list는 와일만 특정값만 가능
         While Not rs.EOF 
             For i = 0 To rs.Fields.Count - 1
                 Response.Write "<tr>"
                 Response.Write "<th>" & rs.Fields(i).Name & "</th>"
-                Response.Write "<td><input type='text' value='" & rs.Fields(i).Value & "'></td>"
+                Response.Write "<td><input type='text' name='" & rs.Fields(i).Name & "' value='" & rs.Fields(i).Value & "'></td>"
                 Response.Write "</tr>"
             Next        
             rs.MoveNext      
         Wend
+        Response.Write "</table>"
+    Response.Write "</form>"
 
   title = Request.Form("title")
   title_eng = Request.Form("title_eng")
@@ -152,17 +155,6 @@
   due_date = Request.Form("due_date")
   admin_id = Request.Form("admin_id")
 
-sql = "UPDATE tb_noti_master SET " &_
-
-
-WHERE noti_id=" + noti_id
-
-
-
-
-
-
-    
 
 %>
 
@@ -171,7 +163,6 @@ WHERE noti_id=" + noti_id
     <script>        
      function fnSubmit() {
         
-
 
         $("#formNoti").submit();
         
