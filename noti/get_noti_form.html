@@ -72,42 +72,150 @@
     </ul>
     
     <h1>NEW NOTIFICATION</h1>
-
-
-    
-    <form id="formNoti"  method="POST" action="noti_list.asp" >
-    <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
-    <input type="hidden" name="action" value="update">
-    <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
-    <a class="btn1 biggest" href="noti_list.asp";>리스트가기</a>
-     
-    
     <%
     ' noti_id 값
     noti_id = Request.QueryString("noti_id")
     noti_id = CInt(noti_id)
-
+	admin_id="mars1030"
+	exeOption="V"
     ' SQL 넣기
-    sql = "SELECT * FROM tb_noti_master WHERE noti_id = "& noti_id
-    set rs=getRs(sql)
-    Response.Write("<p>쿼리: " & sql & "</p>")          
-    Response.Write "<form id='formNoti' method='post' action='noti_list.asp'>"
-    Response.Write "<br><table class='table_datagrid'>"
-    Response.Write "<br><input type='text' name='action' value='update'>"
+    sql="ANG_USP_NOTI_INFO_SAVE "
+	sql=sql&" "&noti_id&" ,"
+	sql=sql&" '"&title&"' ,"  
+	sql=sql&" '"&title_eng&"' ,"  
+	sql=sql&" '"&title_chn&"' ,"  
+	sql=sql&" '"&title_jpn&"' ,"  
+	sql=sql&" '"&sub_title&"' ,"  
+	sql=sql&" '"&sub_title_eng&"' ,"  
+	sql=sql&" '"&sub_title_chn&"' ,"  
+	sql=sql&" '"&sub_title_jp&"' ,"  
+	sql=sql&" '"&mail_body&"' ,"  
+	sql=sql&" '"&mail_body_eng&"' ,"  
+	sql=sql&" '"&mail_body_chn&"' ,"  
+	sql=sql&" '"&mail_body_jpn&"' ,"  
+	sql=sql&" '"&lms_body&"' ,"  
+	sql=sql&" '"&kakao_body&"' ,"  
+	sql=sql&" '"&due_date&"' ,"  
+	sql=sql&" '"&due&"' ,"  
+	sql=sql&" '"&mail_flag&"' ,"  
+	sql=sql&" '"&lms_flag&"' ,"  
+	sql=sql&" '"&fcm_flag&"' ,"  
+	sql=sql&" '"&kakao_flag&"' ,"  
+	sql=sql&" '"&sent_date&"' ,"  
+	sql=sql&" '"&results&"' ,"  
+	sql=sql&" '"&exeOption&"' ,"  
+	sql=sql&" '"&admin_id&"' "  
 
-				'여기는 와일에 for list는 와일만 특정값만 가능
-        While Not rs.EOF 
-            For i = 0 To rs.Fields.Count - 1
-                Response.Write "<tr>"
-                Response.Write "<th>" & rs.Fields(i).Name & "</th>"
-                Response.Write "<td><input type='text' name='" & rs.Fields(i).Name & "' value='" & rs.Fields(i).Value & "'></td>"
-                Response.Write "</tr>"
-            Next        
-            rs.MoveNext      
-        Wend
-        Response.Write "</table>"
-    Response.Write "</form>"
+    set rs=getRs(sql)
 %>
+   <form id="formNoti"  method="POST" action="noti_list.html" >
+            <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
+            <input type="hidden" name="action" value="update">
+            <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
+            <a class="btn1 biggest" href="noti_list.html";>리스트가기</a>
+            <table class="table_datagrid">
+                <tr>
+                    <th>제목</th>
+                    <td><input type="text" name="title" id="title"></td>
+                </tr>
+                <tr>
+                    <th>제목_영어</th>
+                    <td><input type="text" name="title_eng" id="title_eng"></td>
+                </tr>
+                <tr>
+                    <th>제목_중국어</th>
+                    <td><input type="text" name="title_chn" id="title_chn"></td>
+                </tr>
+                <tr>
+                    <th>제목_일본어</th>
+                    <td><input type="text" name="title_jpn" id="title_jpn"></td>
+                </tr>
+                <tr>
+                    <th>서브_제목</th>
+                    <td><input type="text" name="sub_title" id="sub_title"></td>
+                </tr>
+                <tr>
+                    <th>서브_영어</th>
+                    <td><input type="text" name="sub_title_eng" id="sub_title_eng"></td>
+                </tr>
+                <tr>
+                    <th>서브_중국어</th>
+                    <td><input type="text" name="sub_title_chn" id="sub_title_chn"></td>
+                </tr>
+                <tr>
+                    <th>메일</th>
+                    <td><input type="text" name="mail_body" id="mail_body"></td>
+                </tr>
+                <tr>
+                    <th>메일_영어</th>
+                    <td><input type="text" name="mail_body_eng" id="mail_body_eng"></td>
+                </tr>
+                <tr>
+                    <th>메일_중국어</th>
+                    <td><input type="text" name="mail_body_chn" id="mail_body_chn"></td>
+                </tr>
+                <tr>
+                    <th>메일_일본어</th>
+                    <td><input type="text" name="mail_body_jpn" id="mail_body_jpn"></td>
+                </tr>
+                <tr>
+                    <th>LMS</th>
+                    <td><input type="text" name="lms_body" id="lms_body"></td>
+                </tr>
+                <tr>
+                    <th>카카오</th>
+                    <td><input type="text" name="kakao_body" id="kakao_body"></td>
+                </tr>
+                <tr>
+                    <th>예약시간</th>
+                    <td><input type="datetime-local" name="due_date" id="due_date"></td>
+                </tr>
+                <tr>
+                    <th>예약_텀</th>
+                    <td><input type="number" name="due" id="due" min="6" max="12"></td>
+                </tr>
+                <tr>
+                    <th>메일_체크</th>
+                    <td><input type="checkbox" name="mail_flag" id="mail_flag" value="1" checked></td>
+                </tr>
+                <tr>
+                    <th>LMS_체크</th>
+                    <td><input type="checkbox" name="lms_flag" id="lms_flag" value="1" checked></td>
+                </tr>
+                <tr>
+                    <th>Push_체크</th>
+                    <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
+                </tr>
+                <tr>
+                    <th>카카오_체크</th>
+                    <td><input type="checkbox" name="kakao_flag" id="kakao_flag" value="1" checked></td>
+                </tr>
+                <tr>
+                    <th>Push_체크</th>
+                    <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
+                </tr>
+                <tr>
+                    <th>실제 전송날짜</th>
+                    <td><input type="text" name="sent_date" id="sent_date" readonly></td>
+                </tr>
+                <tr>
+                    <th>results</th>
+                    <td><input type="text" name="results" id="results" readonly></td>
+                </tr>
+                <tr>
+                    <th>실행옵션_(hidden)</th>
+                    <td><input type="text" name="exeOption" id="exeOption" readonly></td>
+                </tr>
+                <tr>
+                    <th>관리자_아이디</th>
+                    <td><input type="text" name="admin_id" id="admin_id" readonly></td>
+                </tr>
+            </table>
+
+    
+    
+     
+    
 
       
     </form>
