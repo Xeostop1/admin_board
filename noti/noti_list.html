@@ -32,8 +32,11 @@
   admin_id = Request.Form("admin_id")
 
 noti_id = Replace(noti_id, ",", "")
-noti_id = Replace(noti_id, " ", "")
-noti_id = CInt(noti_id)
+'noti_id = Replace(noti_id, " ", "")
+'왜 자꾸 숫자로 안넘어와??
+'noti_id = CInt(noti_id)
+'noti_id=19
+
 Response.Write("<p>noti_id???:" & noti_id & "</p>")
 Response.Write("<p>title: " & title & "</p>")
 
@@ -102,7 +105,7 @@ cmd.Execute
 				While Not rs.EOF 
 					Response.Write "<tr>"
 					Response.Write "<th>" & rs.Fields("noti_id").Value & "</th>"
-					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "'>" & rs.Fields("title").Value & "</a></td>"
+					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "'>" & rs.Fields("title").Value & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs.Fields("noti_id").Value & ");'>DEL</a></td>"
 					Response.Write "</tr>"
 					rs.MoveNext      
 				Wend
@@ -130,7 +133,27 @@ cmd.Execute
             ' response.write("<p>title: " & kakao_body & "<br><br></p>")
 
 			%>
+<script>        
+     function fnSubmit(noti_id) {
+		var r = confirm("삭제?");
+		if (r == true) {
+			
+				$.post('set_noti_info.html', { noti_id: noti_id })
+					.done(function(response) {
+						location.reload();
+					})
+					.fail(function(response) {
+						alert("삭제 실패");
+					});
+			}
+		      
 
+//        $("#formNoti").submit();
+        
+        // fnPreSubmit 사용해서 필수필드 확인
+        // 후 Submit 합니다. action = set_noti_info.html
+      }
+    </script>
 			
 		</body>
 </html>

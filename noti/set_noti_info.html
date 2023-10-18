@@ -1,0 +1,167 @@
+<% @Language=VBScript CodePage=65001%>
+<!--#include virtual=/sb/inc/vbutil.inc-->
+<%
+  Response.CodePage = 65001
+  Response.CharSet = "utf-8"
+
+  ' noti_id = Request.QueryString("noti_id")
+  ' title = Request.QueryString("title")
+  ' title_eng = Request.QueryString("title_eng")
+  ' title_chn = Request.QueryString("title_chn")
+  ' title_jpn = Request.QueryString("title_jpn")
+  ' sub_title = Request.QueryString("sub_title")
+  ' sub_title_eng = Request.QueryString("sub_title_eng")
+  ' sub_title_jpn = Request.QueryString("sub_title_jpn")
+  ' sub_title_chn = Request.QueryString("sub_title_chn")
+  ' mail_body = Request.QueryString("mail_body")
+  ' mail_body_eng = Request.QueryString("mail_body_eng")
+  ' sub_title = Request.QueryString("title")
+  ' mail_body_chn = Request.QueryString("mail_body_chn")
+  ' mail_body_jpn = Request.QueryString("mail_body_jpn")
+  ' lms_body = Request.QueryString("lms_body")
+  ' kakao_body = Request.QueryString("kakao_body")
+  ' due = Request.QueryString("due")
+  ' mail_flag = Request.QueryString("mail_flag")
+  ' lms_flag = Request.QueryString("lms_flag")
+  ' fcm_flag = Request.QueryString("fcm_flag")
+  ' kakao_flag = Request.QueryString("kakao_flag")
+  ' sent_date = Request.QueryString("sent_date")
+  ' results = Request.QueryString("results")
+  ' due_date = Request.QueryString("due_date")
+  ' admin_id = Request.QueryString("admin_id")
+
+  
+%>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="http://mdev.gvg.co.kr/css/master.css" />
+    <link
+      rel="stylesheet"
+      href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="http://mdev.gvg.co.kr/css/datatables.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <style>
+      .table_datagrid td {
+        text-align: left;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/datatables.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/fixeddatatable.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/jquery.form.js"
+    ></script>
+    <script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
+    <script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
+    <script>
+      // function fnSubmit() {
+      //   alert("fnSubmit() 체크중");
+      //   title_data=$(".title").val()
+      //   console.log(title_data);
+        
+      //   // fnPreSubmit 사용해서 필수필드 확인
+      //   // 후 Submit 합니다. action = set_noti_info.html
+      // }
+    </script>
+  </head>
+
+  <body>
+    <ul class="manual">
+      <li>tb_noti_master 에 기본정보 입력화면 구성</li>
+      <li>*_flag 필드는 1/0 1:발송 0:제외</li>
+      <li>
+        due_date: 발송일 지정, due 발송차수 지정 1~6 (차수별 발송시간은
+        차후설정)
+      </li>
+    </ul>
+    
+    <h1>NEW NOTIFICATION</h1>
+
+
+    
+    <form id="formNoti"  method="POST" action="noti_list.html" >
+    <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
+    <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
+    <a class="btn1 biggest" href="noti_list.html";>리스트가기</a>
+     
+    
+    <%
+noti_id = Request.Form("noti_id")
+noti_id = Replace(noti_id, ",", "")
+sql = "DELETE FROM tb_noti_master WHERE noti_id = " & noti_id
+
+Set conn = Server.CreateObject("ADODB.Connection")
+conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
+conn.Open
+Set cmd = Server.CreateObject("ADODB.Command")
+cmd.ActiveConnection = conn
+cmd.CommandText = sql
+On Error Resume Next
+cmd.Execute
+On Error GoTo 0
+conn.Close 
+Set conn = Nothing 
+
+  title = Request.Form("title")
+  title_eng = Request.Form("title_eng")
+  title_chn = Request.Form("title_chn")
+  title_jpn = Request.Form("title_jpn")
+  sub_title = Request.Form("sub_title")
+  sub_title_eng = Request.Form("sub_title_eng")
+  sub_title_jpn = Request.Form("sub_title_jpn")
+  sub_title_chn = Request.Form("sub_title_chn")
+  mail_body = Request.Form("mail_body")
+  mail_body_eng = Request.Form("mail_body_eng")
+  sub_title = Request.Form("title")
+  mail_body_chn = Request.Form("mail_body_chn")
+  mail_body_jpn = Request.Form("mail_body_jpn")
+  lms_body = Request.Form("lms_body")
+  kakao_body = Request.Form("kakao_body")
+  due = Request.Form("due")
+  mail_flag = Request.Form("mail_flag")
+  lms_flag = Request.Form("lms_flag")
+  fcm_flag = Request.Form("fcm_flag")
+  kakao_flag = Request.Form("kakao_flag")
+  sent_date = Request.Form("sent_date")
+  results = Request.Form("results")
+  due_date = Request.Form("due_date")
+  admin_id = Request.Form("admin_id")
+
+
+%>
+
+      
+    </form>
+    <script>        
+     function fnSubmit() {
+        
+
+        $("#formNoti").submit();
+        
+        // fnPreSubmit 사용해서 필수필드 확인
+        // 후 Submit 합니다. action = set_noti_info.html
+      }
+    </script>
+  </body>
+</html>
