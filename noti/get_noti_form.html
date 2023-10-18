@@ -1,4 +1,37 @@
+<% @Language=VBScript CodePage=65001%>
 <!--#include virtual=/sb/inc/vbutil.inc-->
+<%
+  Response.CodePage = 65001
+  Response.CharSet = "utf-8"
+
+  ' noti_id = Request.QueryString("noti_id")
+  ' title = Request.QueryString("title")
+  ' title_eng = Request.QueryString("title_eng")
+  ' title_chn = Request.QueryString("title_chn")
+  ' title_jpn = Request.QueryString("title_jpn")
+  ' sub_title = Request.QueryString("sub_title")
+  ' sub_title_eng = Request.QueryString("sub_title_eng")
+  ' sub_title_jpn = Request.QueryString("sub_title_jpn")
+  ' sub_title_chn = Request.QueryString("sub_title_chn")
+  ' mail_body = Request.QueryString("mail_body")
+  ' mail_body_eng = Request.QueryString("mail_body_eng")
+  ' sub_title = Request.QueryString("title")
+  ' mail_body_chn = Request.QueryString("mail_body_chn")
+  ' mail_body_jpn = Request.QueryString("mail_body_jpn")
+  ' lms_body = Request.QueryString("lms_body")
+  ' kakao_body = Request.QueryString("kakao_body")
+  ' due = Request.QueryString("due")
+  ' mail_flag = Request.QueryString("mail_flag")
+  ' lms_flag = Request.QueryString("lms_flag")
+  ' fcm_flag = Request.QueryString("fcm_flag")
+  ' kakao_flag = Request.QueryString("kakao_flag")
+  ' sent_date = Request.QueryString("sent_date")
+  ' results = Request.QueryString("results")
+  ' due_date = Request.QueryString("due_date")
+  ' admin_id = Request.QueryString("admin_id")
+
+  
+%>
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
@@ -42,11 +75,14 @@
     <script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
     <script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
     <script>
-      function fnSubmit() {
-        alert("fnSubmit() 체크중");
-        // fnPreSubmit 사용해서 필수필드 확인
-        // 후 Submit 합니다. action = set_noti_info.html
-      }
+      // function fnSubmit() {
+      //   alert("fnSubmit() 체크중");
+      //   title_data=$(".title").val()
+      //   console.log(title_data);
+        
+      //   // fnPreSubmit 사용해서 필수필드 확인
+      //   // 후 Submit 합니다. action = set_noti_info.html
+      // }
     </script>
   </head>
 
@@ -59,73 +95,89 @@
         차후설정)
       </li>
     </ul>
-    <pre>
-				[noti_id] numeric(18,0) IDENTITY(1,1) NOT NULL,
-				[title] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
-				[title_eng] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
-				[title_chn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
-				[title_jpn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
-				[sub_title] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
-				[sub_title_eng] varchar(200) COLLATE Korean_Wansung_CI_AS NULL,
-				[sub_title_chn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
-				[sub_title_jpn] nvarchar(400) COLLATE Korean_Wansung_CI_AS NULL,
-				[mail_body] varchar(2000) COLLATE Korean_Wansung_CI_AS NULL,
-				[mail_body_eng] varchar(2000) COLLATE Korean_Wansung_CI_AS NULL,
-				[mail_body_chn] nvarchar(4000) COLLATE Korean_Wansung_CI_AS NULL,
-				[mail_body_jpn] nvarchar(4000) COLLATE Korean_Wansung_CI_AS NULL,
-				[lms_body] varchar(1000) COLLATE Korean_Wansung_CI_AS NULL,
-				[kakao_body] varchar(1000) COLLATE Korean_Wansung_CI_AS NULL,
-				[sysdate] datetime NULL DEFAULT (getdate()),
-				[due_date] date NULL,
-				[due] int NULL,
-				[mail_flag] int NULL,
-				[lms_flag] int NULL,
-				[fcm_flag] int NULL,
-				[kakao_flag] int NULL,
-				[sent_date] datetime NULL,
-				[results] varchar(200) COLLATE Korean_Wansung_CI_AS NULL
-			</pre
-    >
-    <h1>NEW NOTIFICATION</h1>
-    <% 
-    sql = "SELECT * FROM tb_noti_master" 
-    set rs=getRs(sql)
-    Response.Write("<p>쿼리: " & sql & "</p>")
-    Response.Write("<p>coment 필드명 왜 못가져와요??? </p>")
     
-    Response.Write "<br><table class='table_datagrid'>"
-    Response.Write "<tr>"
+    <h1>NEW NOTIFICATION</h1>
 
-    If Not rs.EOF Then
-    '제목
-      For i = 0 To rs.Fields.Count - 1
-          Response.Write "<th>" & rs.Fields(i).Name & "</th>"
-      Next
-      Response.Write "</tr><tr>"
 
-      ' 인풋
-      For i = 0 To rs.Fields.Count - 1
-          Response.Write "<td><input type='text' class='mustinput' title='제목은 반드시 입력' placeholder='제목은 반드시 입력'></td>"
-      Next
-      Response.Write "</tr>"
-      Response.Write "</table>"
-    End If
-    %>
+    
+    <form id="formNoti"  method="POST" action="noti_list.html" >
+    <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
+    <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
+    <a class="btn1 biggest" href="noti_list.html";>리스트가기</a>
+     
+    
+    <%
+    ' noti_id 값
+    noti_id = Request.QueryString("noti_id")
+    noti_id = CInt(noti_id)
 
-    <form id="formNoti">
-    <input type="hidden" value="<%=noti_id%>">
-      <table class="table_datagrid">
-        <tr>
-          <th>제목</th>
-          <td> <input type="text" class="mustinput" title="제목은 반드시 입력" placeholder="제목은 반드시 입력"/></td>
-        </tr>
-        <tr>
-          <th>서브타이틀</th>
-          <td> <input type="text" class="mustinput" title="제목은 반드시 입력" placeholder="제목은 반드시 입력"/></td>
-        </tr>
-      </table>
-      <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
+    ' SQL 넣기
+    sql = "SELECT * FROM tb_noti_master WHERE noti_id = "& noti_id
+    set rs=getRs(sql)
+    Response.Write("<p>쿼리: " & sql & "</p>")          
+    	Response.Write "<br><table class='table_datagrid'>"
+				'여기는 와일에 for list는 와일만 특정값만 가능
+        While Not rs.EOF 
+            For i = 0 To rs.Fields.Count - 1
+                Response.Write "<tr>"
+                Response.Write "<th>" & rs.Fields(i).Name & "</th>"
+                Response.Write "<td><input type='text' value='" & rs.Fields(i).Value & "'></td>"
+                Response.Write "</tr>"
+            Next        
+            rs.MoveNext      
+        Wend
+
+  title = Request.Form("title")
+  title_eng = Request.Form("title_eng")
+  title_chn = Request.Form("title_chn")
+  title_jpn = Request.Form("title_jpn")
+  sub_title = Request.Form("sub_title")
+  sub_title_eng = Request.Form("sub_title_eng")
+  sub_title_jpn = Request.Form("sub_title_jpn")
+  sub_title_chn = Request.Form("sub_title_chn")
+  mail_body = Request.Form("mail_body")
+  mail_body_eng = Request.Form("mail_body_eng")
+  sub_title = Request.Form("title")
+  mail_body_chn = Request.Form("mail_body_chn")
+  mail_body_jpn = Request.Form("mail_body_jpn")
+  lms_body = Request.Form("lms_body")
+  kakao_body = Request.Form("kakao_body")
+  due = Request.Form("due")
+  mail_flag = Request.Form("mail_flag")
+  lms_flag = Request.Form("lms_flag")
+  fcm_flag = Request.Form("fcm_flag")
+  kakao_flag = Request.Form("kakao_flag")
+  sent_date = Request.Form("sent_date")
+  results = Request.Form("results")
+  due_date = Request.Form("due_date")
+  admin_id = Request.Form("admin_id")
+
+sql = "UPDATE tb_noti_master SET " &_
+
+
+WHERE noti_id=" + noti_id
+
+
+
+
+
+
+    
+
+%>
+
+      
     </form>
-    <script></script>
+    <script>        
+     function fnSubmit() {
+        
+
+
+        $("#formNoti").submit();
+        
+        // fnPreSubmit 사용해서 필수필드 확인
+        // 후 Submit 합니다. action = set_noti_info.html
+      }
+    </script>
   </body>
 </html>
