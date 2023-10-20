@@ -3,9 +3,6 @@
 <%
   Response.CodePage = 65001
   Response.CharSet = "utf-8"
-
- 
-  
 %>
 <html>
   <head>
@@ -49,17 +46,8 @@
     ></script>
     <script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
     <script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
-    <script>
-      // function fnSubmit() {
-      //   alert("fnSubmit() 체크중");
-      //   title_data=$(".title").val()
-      //   console.log(title_data);
-        
-      //   // fnPreSubmit 사용해서 필수필드 확인
-      //   // 후 Submit 합니다. action = set_noti_info.html
-      // }
-    </script>
-  </head>
+    
+    </head>
 
   <body>
     <ul class="manual">
@@ -74,65 +62,94 @@
     <h1>NEW NOTIFICATION</h1>
     <%
     ' noti_id 값
-    noti_id = Request.QueryString("noti_id")
-    noti_id = CInt(noti_id)
-	admin_id="mars1030"
-	exeOption="V"
-    ' SQL 넣기
-    sql="ANG_USP_NOTI_INFO_SAVE "
-	sql=sql&" "&noti_id&" ,"
-	sql=sql&" '"&title&"' ,"  
-	sql=sql&" '"&title_eng&"' ,"  
-	sql=sql&" '"&title_chn&"' ,"  
-	sql=sql&" '"&title_jpn&"' ,"  
-	sql=sql&" '"&sub_title&"' ,"  
-	sql=sql&" '"&sub_title_eng&"' ,"  
-	sql=sql&" '"&sub_title_chn&"' ,"  
-	sql=sql&" '"&sub_title_jp&"' ,"  
-	sql=sql&" '"&mail_body&"' ,"  
-	sql=sql&" '"&mail_body_eng&"' ,"  
-	sql=sql&" '"&mail_body_chn&"' ,"  
-	sql=sql&" '"&mail_body_jpn&"' ,"  
-	sql=sql&" '"&lms_body&"' ,"  
-	sql=sql&" '"&kakao_body&"' ,"  
-	sql=sql&" '"&due_date&"' ,"  
-	sql=sql&" '"&due&"' ,"  
-	sql=sql&" '"&mail_flag&"' ,"  
-	sql=sql&" '"&lms_flag&"' ,"  
-	sql=sql&" '"&fcm_flag&"' ,"  
-	sql=sql&" '"&kakao_flag&"' ,"  
-	sql=sql&" '"&sent_date&"' ,"  
-	sql=sql&" '"&results&"' ,"  
-	sql=sql&" '"&exeOption&"' ,"  
-	sql=sql&" '"&admin_id&"' "  
+    '*******입력값********
+      noti_id = Request("noti_id")
+      Response.Write ("<h1>"& noti_id1 &"</h1>")
+      '*******sql*******
+      admin_id="mars1030"
+      exeOption="V"
+      			
+        ' SQL 넣기
+'noti_id 가 넘어온 경우 기존 정보를 select         
+if cint(noti_id) >0 then
+        sql="ANG_USP_NOTI_INFO_SAVE "
+      sql=sql&" "&noti_id&" ,"
+      sql=sql&" '"&title&"' ,"  
+      sql=sql&" '"&title_eng&"' ,"  
+      sql=sql&" '"&title_chn&"' ,"  
+      sql=sql&" '"&title_jpn&"' ,"  
+      sql=sql&" '"&sub_title&"' ,"  
+      sql=sql&" '"&sub_title_eng&"' ,"  
+      sql=sql&" '"&sub_title_chn&"' ,"  
+      sql=sql&" '"&sub_title_jp&"' ,"  
+      sql=sql&" '"&mail_body&"' ,"  
+      sql=sql&" '"&mail_body_eng&"' ,"  
+      sql=sql&" '"&mail_body_chn&"' ,"  
+      sql=sql&" '"&mail_body_jpn&"' ,"  
+      sql=sql&" '"&lms_body&"' ,"  
+      sql=sql&" '"&kakao_body&"' ,"  
+      sql=sql&" '"&due_date&"' ,"  
+      sql=sql&" '"&due&"' ,"  
+      sql=sql&" '"&mail_flag&"' ,"  
+      sql=sql&" '"&lms_flag&"' ,"  
+      sql=sql&" '"&fcm_flag&"' ,"  
+      sql=sql&" '"&kakao_flag&"' ,"  
+      sql=sql&" '"&sent_date&"' ,"  
+      sql=sql&" '"&results&"' ,"  
+      sql=sql&" '"&exeOption&"' ,"  
+      sql=sql&" '"&admin_id&"' "  
+      response.write sql
+	  set rs=getRs(sql)
+	  	if not(rs.eof or rs.bof) then
+			title=rs("title")  	
+			title_eng=rs("title_eng")  	
+			title_chn=rs("title_chn")  	
+			title_jpn=rs("title_jpn")  	
+			response.write title
+		end if 	
+	  rs.Close
+	  set rs=Nothing
+end if	   
 
-    set rs=getRs(sql)
 %>
-   <form id="formNoti"  method="POST" action="noti_list.html" >
+<script>
+	function fnSubmit(exeOption){
+		$('#exeOption').val(exeOption);
+		var flag=false;
+		exeOption=='D'?flag=confirm('지우냐?'):flag=true;
+		if(flag){
+			$('#formNoti').submit();
+		}
+	}	
+</script>
+<form id="formNoti"  method="POST" action="set_noti_info.html" >
             <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
-            <input type="hidden" name="action" value="update">
-            <a class="btn2 biggest" onclick="fnSubmit();">SAVE</a>
-            <a class="btn1 biggest" href="noti_list.html";>리스트가기</a>
+            <a class="btn2 biggest" onclick="fnSubmit('');">SAVE</a>
+            <a class="btn3 biggest" onclick="fnSubmit('D');">DEL</a>
+            <a class="btn3 biggest" href="noti_list.html">LIST</a>
             <table class="table_datagrid">
                 <tr>
-                    <th>제목</th>
-                    <td><input type="text" name="title" id="title"></td>
+                    <th>제 목</th>
+                    <td>
+                      <input type="text" value="<%=title%>" name="title" id="title"> 
+                      <input type="reset" value="리셋 필요할까요?">
+                    </td>
                 </tr>
                 <tr>
                     <th>제목_영어</th>
-                    <td><input type="text" name="title_eng" id="title_eng"></td>
+                    <td><input type="text" value="<%=title_eng%>" name="title_eng" id="title_eng"></td>
                 </tr>
                 <tr>
                     <th>제목_중국어</th>
-                    <td><input type="text" name="title_chn" id="title_chn"></td>
+                    <td><input type="text"  value="<%=title_chn%>" name="title_chn" id="title_chn"></td>
                 </tr>
                 <tr>
                     <th>제목_일본어</th>
-                    <td><input type="text" name="title_jpn" id="title_jpn"></td>
+                    <td><input type="text"  value="<%=title_jpn%>"  name="title_jpn" id="title_jpn"></td>
                 </tr>
                 <tr>
                     <th>서브_제목</th>
-                    <td><input type="text" name="sub_title" id="sub_title"></td>
+                    <td><input type="text" value="<%=sub_title%>"  name="sub_title" id="sub_title"></td>
                 </tr>
                 <tr>
                     <th>서브_영어</th>
@@ -144,27 +161,28 @@
                 </tr>
                 <tr>
                     <th>메일</th>
-                    <td><input type="text" name="mail_body" id="mail_body"></td>
+                    <td><textarea name="mail_body" id="mail_body" cols="60" rows="10"></textarea>
                 </tr>
                 <tr>
                     <th>메일_영어</th>
-                    <td><input type="text" name="mail_body_eng" id="mail_body_eng"></td>
+                    <td><textarea name="mail_body_eng" id="mail_body_eng" cols="60" rows="10"></textarea></td>
                 </tr>
                 <tr>
                     <th>메일_중국어</th>
-                    <td><input type="text" name="mail_body_chn" id="mail_body_chn"></td>
+                    <td><textarea name="mail_body_chn" id="mail_body_chn" cols="60" rows="10"></textarea></td>
                 </tr>
                 <tr>
                     <th>메일_일본어</th>
-                    <td><input type="text" name="mail_body_jpn" id="mail_body_jpn"></td>
+                    <td><textarea name="mail_body_jpn" id="mail_body_jpn" cols="60" rows="10"></textarea></td>
+                    
                 </tr>
                 <tr>
                     <th>LMS</th>
-                    <td><input type="text" name="lms_body" id="lms_body"></td>
+                    <td><textarea name="lms_body" id="lms_body" cols="60" rows="10"></textarea></td>
                 </tr>
                 <tr>
                     <th>카카오</th>
-                    <td><input type="text" name="kakao_body" id="kakao_body"></td>
+                    <td><textarea name="kakao_body" id="kakao_body" cols="60" rows="10"></textarea></td>
                 </tr>
                 <tr>
                     <th>예약시간</th>
@@ -174,25 +192,17 @@
                     <th>예약_텀</th>
                     <td><input type="number" name="due" id="due" min="6" max="12"></td>
                 </tr>
-                <tr>
+                <tr >
                     <th>메일_체크</th>
-                    <td><input type="checkbox" name="mail_flag" id="mail_flag" value="1" checked></td>
-                </tr>
-                <tr>
+                    <td style="width: 0px;"><input type="checkbox" name="mail_flag" id="mail_flag" value="1" checked></td>
                     <th>LMS_체크</th>
                     <td><input type="checkbox" name="lms_flag" id="lms_flag" value="1" checked></td>
                 </tr>
                 <tr>
-                    <th>Push_체크</th>
-                    <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
-                </tr>
-                <tr>
-                    <th>카카오_체크</th>
+                  <th>Push_체크</th>
+                  <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
+                  <th>카카오_체크</th>
                     <td><input type="checkbox" name="kakao_flag" id="kakao_flag" value="1" checked></td>
-                </tr>
-                <tr>
-                    <th>Push_체크</th>
-                    <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
                 </tr>
                 <tr>
                     <th>실제 전송날짜</th>
@@ -204,28 +214,13 @@
                 </tr>
                 <tr>
                     <th>실행옵션_(hidden)</th>
-                    <td><input type="text" name="exeOption" id="exeOption" readonly></td>
+                    <td><input type="text" name="exeOption" value="<%=exeOption%>" id="exeOption" readonly></td>
                 </tr>
                 <tr>
                     <th>관리자_아이디</th>
                     <td><input type="text" name="admin_id" id="admin_id" readonly></td>
                 </tr>
-            </table>
-
-    
-    
-     
-    
-
-      
+            </table>     
     </form>
-    <script>        
-     function fnSubmit() {
-        $("#formNoti").submit();
-        
-        // fnPreSubmit 사용해서 필수필드 확인
-        // 후 Submit 합니다. action = set_noti_info.html
-      }
-    </script>
   </body>
 </html>

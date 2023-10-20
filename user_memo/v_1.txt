@@ -23,9 +23,11 @@
 			<script type="text/javascript" src="http://mdev.gvg.co.kr/jquery/jquery.form.js"></script>
 			<script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
 			<script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
-			
-            <script>
-            
+			<script>
+				function addData() {
+					window.location.href ='set_noti_info.html';
+				}
+				
 				function fnSubmit(noti_id) {
 					var r = confirm("삭제?");
 					if (r == true) {
@@ -47,13 +49,10 @@
 				<li>due_date: 발송일 지정, due 발송차수 지정 1~6 (차수별 발송시간은 차후설정)</li>
 			</ul>
 			<h1 style="display: inline-block;">NOTIFICATION LIST </h1>
-			
             <%
-			noti_id=0   
+	         noti_id=0   
 			admin_id="mars1030"
-            exeOption="V"
-
-			
+			exeOption="V"
 		    ' SQL 넣기
 		    sql="ANG_USP_NOTI_INFO_SAVE "
 			sql=sql&" "&noti_id&" ,"
@@ -82,25 +81,79 @@
 			sql=sql&" '"&exeOption&"' ,"  
 			sql=sql&" '"&admin_id&"' "  
 			set rs=getRs(sql)
-            '<a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "&exeOption=" & rs.Fields("exeOption").Value & "'>
-            %>
-            <a href="get_noti_form.html">새로 작성하기</a>
-            <%
+			'Response.Write("<p>쿼리: " & sql & "</p>")
+
 			Response.Write "<br><table class='table_datagrid'>"
 				'제목
 				While Not rs.EOF 
 					Response.Write "<tr>"
-					Response.Write "<th>" & rs("noti_id")& "</th>"
-					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs("noti_id")& "&exeOption='>" & rs("title") & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs.Fields("noti_id").Value & ");'>DEL</a></td>"
+					Response.Write "<th>" & rs.Fields("noti_id").Value & "</th>"
+					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "'>" & rs.Fields("title").Value & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs.Fields("noti_id").Value & ");'>DEL</a></td>"
 					Response.Write "</tr>"
 					rs.MoveNext      
 				Wend
+		
 			Response.Write "</table>"
+
+			action = Request.Form("action")			
+			noti_id = Request.Form("noti_id")
+			title = Request.Form("title")
+			noti_id = Replace(noti_id, ",", "")
+			
+			' noti_id = Request.QueryString("noti_id")
+ 			' title = Request.QueryString("title")
+			' Response.Write ("<h1>noti_id / QueryString "& noti_id &"</h1>")
+			' Response.Write ("<h1>QueryString / QueryString "& title &"</h1>")
+				Set conn = Server.CreateObject("ADODB.Connection")
+				conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
+				conn.Open
+
+			If action = "set" Then 
+				Response.Write ("<h1>"& action &"</h1>")
+			 	Response.Write("<p>set action</p>")
+				sql1= "INSERT INTO tb_noti_master (title) VALUES ('" & title & "')"
+				Response.Write ("<h2> SQL: "& sql1 &"</h2>")
+				Response.Write ("<h2> title: "& title &"</h2>")
+				Set cmd_insert= Server.CreateObject("ADODB.Command")
+				cmd_insert.ActiveConnection= conn
+				cmd_insert.CommandText= sql1
+				cmd_insert.Execute 
+				Response.Redirect("noti_list.asp")
+
+			ElseIf action = "del" Then
+				Response.Write("<p>del action</p>")
+				sql = "DELETE FROM tb_noti_master WHERE noti_id = " & noti_id  
+				Set conn = Server.CreateObject("ADODB.Connection")
+				conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
+				conn.Open
+				Set cmd = Server.CreateObject("ADODB.Command")
+				cmd.ActiveConnection = conn
+				cmd.CommandText = sql
+				cmd.Execute
+
+			ElseIf action = "update, update" Then
+			 	Response.Write("<p>update action</p>")
+				sql1 = "UPDATE tb_noti_master SET title = '" & title & "' WHERE noti_id = " & noti_id 
+				Response.Write("<p>sql1: " & sql1 & "</p>")
+				Set conn = Server.CreateObject("ADODB.Connection")
+				conn.ConnectionString = "Provider=SQLOLEDB;Data Source=sql16ssd-004.localnet.kr,1433;Initial Catalog=gvgurbanstoreb_planb;User ID=gvgurbanstoreb_planb;Password=rnjswodls1030;"
+				conn.Open
+				Set cmd = Server.CreateObject("ADODB.Command")
+				cmd.ActiveConnection = conn
+				cmd.CommandText = sql1
+				cmd.Execute
+				Response.Redirect("noti_list.asp")
+
+			End If
+			
+			conn.Close
+			Set conn = Nothing 
+			'Response.Redirect "noti_list.html"
+
+			Response.Write("<p>noti_id???:" & noti_id & "</p>")
+			Response.Write("<p>title: " & title & "</p>")
 			Response.Write ("<h1>"& action &"</h1>")
-            noti_id1=Request.QueryString("noti_id")
-			Response.Write("<p>noti_id***: " & noti_id & "</p>")
-			Response.Write("<p>noti_id1***: " & noti_id1 & "</p>")
-			Response.Write("<p>title***: " & title & "</p>")
+			
 			%>
 		</body>
 </html>
