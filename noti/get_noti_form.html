@@ -68,44 +68,69 @@
       '*******sql*******
       admin_id="mars1030"
       exeOption="V"
+
       			
-        ' SQL 넣기
-'noti_id 가 넘어온 경우 기존 정보를 select         
+' SQL 넣기
+'noti_id 가 넘어온 경우 기존 정보를 select   /nvarchar N넣기      
 if cint(noti_id) >0 then
-        sql="ANG_USP_NOTI_INFO_SAVE "
-      sql=sql&" "&noti_id&" ,"
-      sql=sql&" '"&title&"' ,"  
-      sql=sql&" '"&title_eng&"' ,"  
-      sql=sql&" '"&title_chn&"' ,"  
-      sql=sql&" '"&title_jpn&"' ,"  
-      sql=sql&" '"&sub_title&"' ,"  
-      sql=sql&" '"&sub_title_eng&"' ,"  
-      sql=sql&" '"&sub_title_chn&"' ,"  
-      sql=sql&" '"&sub_title_jp&"' ,"  
-      sql=sql&" '"&mail_body&"' ,"  
-      sql=sql&" '"&mail_body_eng&"' ,"  
-      sql=sql&" '"&mail_body_chn&"' ,"  
-      sql=sql&" '"&mail_body_jpn&"' ,"  
-      sql=sql&" '"&lms_body&"' ,"  
-      sql=sql&" '"&kakao_body&"' ,"  
-      sql=sql&" '"&due_date&"' ,"  
-      sql=sql&" '"&due&"' ,"  
-      sql=sql&" '"&mail_flag&"' ,"  
-      sql=sql&" '"&lms_flag&"' ,"  
-      sql=sql&" '"&fcm_flag&"' ,"  
-      sql=sql&" '"&kakao_flag&"' ,"  
-      sql=sql&" '"&sent_date&"' ,"  
-      sql=sql&" '"&results&"' ,"  
-      sql=sql&" '"&exeOption&"' ,"  
-      sql=sql&" '"&admin_id&"' "  
-      response.write sql
+    sql="ANG_USP_NOTI_INFO_SAVE "
+    sql=sql&" "&noti_id&" ,"
+    sql=sql&" '"&dbstr(title)&"' ,"  
+    sql=sql&" '"&dbstr(title_eng)&"' ,"  
+    sql=sql&" '"&dbstr(title_chn)&"' ,"  
+    sql=sql&" '"&dbstr(title_jpn)&"' ," 
+    sql=sql&" '"&dbstr(sub_title)&"' ,"  
+    sql=sql&" '"&dbstr(sub_title_eng)&"' ,"  
+    sql=sql&" '"&dbstr(sub_title_chn)&"' ,"  
+    sql=sql&" '"&dbstr(sub_title_jpn)&"' ,"  
+    sql=sql&" '"&dbstr(mail_body)&"' ,"  
+    sql=sql&" '"&dbstr(mail_body_eng)&"' ,"  
+    sql=sql&" '"&dbstr(mail_body_chn)&"' ,"  
+    sql=sql&" '"&dbstr(mail_body_jpn)&"' ,"  
+    sql=sql&" '"&dbstr(lms_body)&"' ,"  
+    sql=sql&" '"&dbstr(kakao_body)&"' ,"  
+    sql=sql&" '"&due_date&"' ,"  
+    sql=sql&" '"&due&"' ,"  
+    sql=sql&" '"&mail_flag&"' ,"  
+    sql=sql&" '"&lms_flag&"' ,"  
+    sql=sql&" '"&fcm_flag&"' ,"  
+    sql=sql&" '"&kakao_flag&"' ,"  
+    sql=sql&" '"&sent_date&"' ,"  
+    sql=sql&" '"&results&"' ,"  
+    sql=sql&" '"&exeOption&"' ,"  
+    sql=sql&" '"&admin_id&"' "  
+    response.write sql
+    
 	  set rs=getRs(sql)
 	  	if not(rs.eof or rs.bof) then
 			title=rs("title")  	
 			title_eng=rs("title_eng")  	
 			title_chn=rs("title_chn")  	
 			title_jpn=rs("title_jpn")  	
+            sub_title=rs("sub_title")  	
+			sub_title_eng=rs("sub_title_eng")  	
+			sub_title_chn=rs("sub_title_chn")  	
+			sub_title_jpn=rs("sub_title_jpn")  	
+            mail_body=rs("mail_body")  	
+			mail_body_eng=rs("mail_body_eng")  	
+			mail_body_chn=rs("mail_body_chn")  	
+			mail_body_jpn=rs("mail_body_jpn")  	
+            lms_body=rs("lms_body")  	
+			kakao_body=rs("kakao_body")  	
+			due_date=rs("due_date")  	
+            due=rs("due")  	
+			mail_flag=rs("mail_flag")  	
+			lms_flag=rs("lms_flag")  	
+			fcm_flag=rs("fcm_flag")  	
+            kakao_flag=rs("kakao_flag")  	
+			sent_date=rs("sent_date")  	
+            '왜 안되지???
+			'results=rs("results")  	
+			'exeOption=rs("exeOption")  	
+            'admin_id=rs("admin_id")  	
 			response.write title
+
+            response.write ("<h1>due: "& due &"</h1>")
 		end if 	
 	  rs.Close
 	  set rs=Nothing
@@ -113,6 +138,10 @@ end if
 
 %>
 <script>
+    $(document).ready(function() {
+        setRadio(6);
+    });
+
 	function fnSubmit(exeOption){
 		$('#exeOption').val(exeOption);
 		var flag=false;
@@ -120,13 +149,36 @@ end if
 		if(flag){
 			$('#formNoti').submit();
 		}
-	}	
+	}
+    
+
+    function setRadio(num){
+        var due="<%=due%>"
+    var td = $('#radioGroup');
+    for (var i = 1; i <= num; i++) {
+        var radioButton = $('<input>', {
+            type: 'radio', 
+            id:`due${i}`,
+            class: `due`,
+            name: 'due',
+            value: `${i}`,
+            style: 'display:inline-block;',
+            checked: i === due ? true : false 
+        })
+        var label = $('<label>', {for: `due${i}`, style: 'display:inline-block;'}).text(`${i}시`);
+        
+        td.append(radioButton);
+        td.append(label);
+        td.append("&nbsp; &nbsp; &nbsp;");
+    }
+}
 </script>
 <form id="formNoti"  method="POST" action="set_noti_info.html" >
             <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
             <a class="btn2 biggest" onclick="fnSubmit('');">SAVE</a>
+            <a class="btn4 biggest" onclick="fnSubmit('');">ADD</a>
             <a class="btn3 biggest" onclick="fnSubmit('D');">DEL</a>
-            <a class="btn3 biggest" href="noti_list.html">LIST</a>
+            <a class="btn1 biggest" href="noti_list.html">LIST</a>
             <table class="table_datagrid">
                 <tr>
                     <th>제 목</th>
@@ -137,88 +189,99 @@ end if
                 </tr>
                 <tr>
                     <th>제목_영어</th>
-                    <td><input type="text" value="<%=title_eng%>" name="title_eng" id="title_eng"></td>
+                    <td><input type="text" id="title_eng" name="title_eng"  value="<%=title_eng%>"></td>
                 </tr>
                 <tr>
                     <th>제목_중국어</th>
-                    <td><input type="text"  value="<%=title_chn%>" name="title_chn" id="title_chn"></td>
+                    <td><input type="text"  id="title_chn" name="title_chn" value="<%=title_chn%>"></td>
                 </tr>
                 <tr>
                     <th>제목_일본어</th>
-                    <td><input type="text"  value="<%=title_jpn%>"  name="title_jpn" id="title_jpn"></td>
+                    <td><input type="text"  id="title_jpn" name="title_jpn" value="<%=title_jpn%>" ></td>
                 </tr>
                 <tr>
                     <th>서브_제목</th>
-                    <td><input type="text" value="<%=sub_title%>"  name="sub_title" id="sub_title"></td>
+                    <td><input type="text" name="sub_title" id="sub_title" value="<%=sub_title%>"></td>
                 </tr>
                 <tr>
                     <th>서브_영어</th>
-                    <td><input type="text" name="sub_title_eng" id="sub_title_eng"></td>
+                    <td><input type="text" id="sub_title_eng" name="sub_title_eng"  value="<%=sub_title_eng%>"></td>
                 </tr>
                 <tr>
                     <th>서브_중국어</th>
-                    <td><input type="text" name="sub_title_chn" id="sub_title_chn"></td>
+                    <td><input type="text" id="sub_title_chn" name="sub_title_chn"  value="<%=sub_title_chn%>"></td>
+                </tr>
+                  <tr>
+                    <th>서브_일본어</th>
+                    <td><input type="text" id="sub_title_jpn" name="sub_title_jpn"  value="<%=sub_title_jpn%>"></td>
                 </tr>
                 <tr>
                     <th>메일</th>
-                    <td><textarea name="mail_body" id="mail_body" cols="60" rows="10"></textarea>
+                    <td><textarea name="mail_body" id="mail_body" cols="60" rows="10"><%=mail_body%></textarea>
                 </tr>
                 <tr>
                     <th>메일_영어</th>
-                    <td><textarea name="mail_body_eng" id="mail_body_eng" cols="60" rows="10"></textarea></td>
+                    <td><textarea name="mail_body_eng" id="mail_body_eng" cols="60" rows="10" ><%=mail_body_eng%></textarea></td>
                 </tr>
                 <tr>
                     <th>메일_중국어</th>
-                    <td><textarea name="mail_body_chn" id="mail_body_chn" cols="60" rows="10"></textarea></td>
+                    <td><textarea name="mail_body_chn" id="mail_body_chn" cols="60" rows="10"><%=mail_body_chn%></textarea></td>
                 </tr>
                 <tr>
                     <th>메일_일본어</th>
-                    <td><textarea name="mail_body_jpn" id="mail_body_jpn" cols="60" rows="10"></textarea></td>
+                    <td><textarea name="mail_body_jpn" id="mail_body_jpn" cols="60" rows="10"><%=mail_body_jpn%></textarea></td>
                     
                 </tr>
                 <tr>
                     <th>LMS</th>
-                    <td><textarea name="lms_body" id="lms_body" cols="60" rows="10"></textarea></td>
+                    <td><textarea name="lms_body" id="lms_body" cols="60" rows="10"><%=lms_body%></textarea></td>
                 </tr>
                 <tr>
                     <th>카카오</th>
-                    <td><textarea name="kakao_body" id="kakao_body" cols="60" rows="10"></textarea></td>
+                    <td><textarea name="kakao_body" id="kakao_body" cols="60" rows="10"><%=kakao_body%></textarea></td>
                 </tr>
                 <tr>
+                    <th>예약날짜</th>
+                    <td><input type="date" name="due_date" id="due_date" value="<%=due_date%>"></td>
+                </tr>
+                <tr >
                     <th>예약시간</th>
-                    <td><input type="datetime-local" name="due_date" id="due_date"></td>
-                </tr>
-                <tr>
-                    <th>예약_텀</th>
-                    <td><input type="number" name="due" id="due" min="6" max="12"></td>
+                    <td id="radioGroup">
+                     <input type="radio" name="due" id="due11" value="11">
+                    <label for ="due11" style="display:inline-block;">11시</label>
+                     <input type="radio" name="due" id="due12" value="12">
+                    <label for =due12 style="display:inline-block;">12시</label>
+                    </td>
                 </tr>
                 <tr >
                     <th>메일_체크</th>
-                    <td style="width: 0px;"><input type="checkbox" name="mail_flag" id="mail_flag" value="1" checked></td>
+                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="mail_flag" id="mail_flag" value="1" <% if mail_flag = 1 then %> checked <% end if %>></td>
                     <th>LMS_체크</th>
-                    <td><input type="checkbox" name="lms_flag" id="lms_flag" value="1" checked></td>
+                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="lms_flag" id="lms_flag" value="1" <% if lms_flag = 1 then %> checked <% end if %>></td>
+                    
                 </tr>
                 <tr>
                   <th>Push_체크</th>
-                  <td><input type="checkbox" name="fcm_flag" id="fcm_flag" value="1" checked></td>
+                  <td>
+                  <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="fcm_flag" id="fcm_flag" value="1" <% if fcm_flag = 1 then %> checked <% end if %>></td>
                   <th>카카오_체크</th>
-                    <td><input type="checkbox" name="kakao_flag" id="kakao_flag" value="1" checked></td>
+                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="kakao_flag" id="kakao_flag" value="1" <% if kakao_flag = 1 then %> checked <% end if %>></td>
                 </tr>
                 <tr>
                     <th>실제 전송날짜</th>
-                    <td><input type="text" name="sent_date" id="sent_date" readonly></td>
+                    <td><input type="datetime" name="sent_date" id="sent_date" readonly value="<%=sent_date%>"></td>
                 </tr>
                 <tr>
                     <th>results</th>
-                    <td><input type="text" name="results" id="results" readonly></td>
+                    <td><input type="text" name="results" id="results" readonly value="<%=results%>"></td>
                 </tr>
                 <tr>
                     <th>실행옵션_(hidden)</th>
-                    <td><input type="text" name="exeOption" value="<%=exeOption%>" id="exeOption" readonly></td>
+                    <td><input type="text" name="exeOption"  id="exeOption" readonly value="<%=exeOption%>"></td>
                 </tr>
                 <tr>
-                    <th>관리자_아이디</th>
-                    <td><input type="text" name="admin_id" id="admin_id" readonly></td>
+                    <th>관리자_아이디_(hidden)</th>
+                    <td><input type="text" name="admin_id" id="admin_id"  value="<%=admin_id%>" readonly></td>
                 </tr>
             </table>     
     </form>

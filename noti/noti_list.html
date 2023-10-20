@@ -53,6 +53,26 @@
 			admin_id="mars1030"
             exeOption="V"
 
+            
+            itemsPage=10
+            set rsIdNum=getRs("select COUNT(noti_id) as a from TB_NOTI_MASTER")
+            totalCount=rsIdNum("a")
+            totalPageC=Int(totalCount/itemsPage)
+            If rsIdNum("a") Mod itemsPage <> 0 Then totalPageC=totalPageC+1
+            If curPage = "" Then curPage = 1 
+
+            ' Set the current page number
+            If Request.QueryString("page") <> "" Then 
+                currentPage = Request.QueryString("page") 
+            Else 
+                currentPage = 1 
+            End If
+
+            sRow=(curPage-1)*itemsPage+1
+            eRos=sRow+itemsPage-1
+            sqlPage="WITH Results AS (SELECT ROW_NUMBER() OVER(ORDER BY noti_id DESC) AS Row, * FROM TB_NOTI_MASTER) SELECT * FROM Results WHERE Row >= " & sRow & " AND Row <= " & eRos             
+            set rsPage=getRs(sqlPage)
+
 			
 		    ' SQL 넣기
 		    sql="ANG_USP_NOTI_INFO_SAVE "
@@ -81,6 +101,7 @@
 			sql=sql&" '"&results&"' ,"  
 			sql=sql&" '"&exeOption&"' ,"  
 			sql=sql&" '"&admin_id&"' "  
+            sql=sql& ""
 			set rs=getRs(sql)
             '<a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "&exeOption=" & rs.Fields("exeOption").Value & "'>
             %>
@@ -97,10 +118,13 @@
 				Wend
 			Response.Write "</table>"
 			Response.Write ("<h1>"& action &"</h1>")
-            noti_id1=Request.QueryString("noti_id")
-			Response.Write("<p>noti_id***: " & noti_id & "</p>")
-			Response.Write("<p>noti_id1***: " & noti_id1 & "</p>")
-			Response.Write("<p>title***: " & title & "</p>")
+            
+            Response.Write ("<div class='page'>")
+            For i = 1 To totalCount 
+                    Response.Write "<a href='?page=" & i & "'>" & i & "</a> "
+                Next
+                Response.Write "</div>"
+
 			%>
 		</body>
 </html>

@@ -1,51 +1,52 @@
 <% @Language=VBScript CodePage=65001%>
 <!--#include virtual=/sb/inc/vbutil.inc-->
 <%
+' nvarchar N넣기  
 noti_id = Request.Form("noti_id")
 if noti_id="" then noti_id=0
-      title = Request.Form("title")
-      title_eng = Request.Form("title_eng")
-      title_chn = Request.Form("title_chn")
-      title_jpn = Request.Form("title_jpn")
-      title_jpn = Request.Form("title_jpn")
-      sub_title = Request.Form("sub_title")
-      sub_title_eng = Request.Form("sub_title_eng")
-      sub_title_chn = Request.Form("sub_title_chn")
-      sub_title_jpn = Request.Form("sub_title_jpn")
-      mail_body = Request.Form("mail_body")
-      mail_body_eng = Request.Form("mail_body_eng")
-      mail_body_chn = Request.Form("mail_body_chn")
-      mail_body_jpn = Request.Form("mail_body_jpn")
-      lms_body = Request.Form("lms_body")
-      kakao_body = Request.Form("kakao_body")
-      due_date = Request.Form("due_date")
-      due = Request.Form("due")
-      mail_flag = Request.Form("mail_flag")
-      lms_flag = Request.Form("lms_flag")
-      fcm_flag = Request.Form("fcm_flag")
-      kakao_flag = Request.Form("kakao_flag")
-      sent_date = Request.Form("sent_date")
-      results = Request.Form("results")
-      exeOption = Request.Form("exeOption")
-      admin_id = "mars1030"
-      
+    title = Request.Form("title")
+    title_eng = Request.Form("title_eng")
+    title_chn = Request.Form("title_chn")
+    title_jpn = Request.Form("title_jpn")
+    title_jpn = Request.Form("title_jpn")
+    sub_title = Request.Form("sub_title")
+    sub_title_eng = Request.Form("sub_title_eng")
+    sub_title_chn = Request.Form("sub_title_chn")
+    sub_title_jpn = Request.Form("sub_title_jpn")
+    mail_body = Request.Form("mail_body")
+    mail_body_eng = Request.Form("mail_body_eng")
+    mail_body_chn = Request.Form("mail_body_chn")
+    mail_body_jpn = Request.Form("mail_body_jpn")
+    lms_body = Request.Form("lms_body")
+    kakao_body = Request.Form("kakao_body")
+    due_date = Request.Form("due_date")
+    due = Request.Form("due")
+    mail_flag = Request.Form("mail_flag")
+    lms_flag = Request.Form("lms_flag")
+    fcm_flag = Request.Form("fcm_flag")
+    kakao_flag = Request.Form("kakao_flag")
+    sent_date = Request.Form("sent_date")
+    results = Request.Form("results")
+    exeOption = Request.Form("exeOption")
+    admin_id = "mars1030"
+
 
  sql="ANG_USP_NOTI_INFO_SAVE "
       sql=sql&" "&noti_id&" ,"
       sql=sql&" '"&dbstr(title)&"' ,"  
-      sql=sql&" '"&title_eng&"' ,"  
-      sql=sql&" N'"&title_chn&"' ,"  
-      sql=sql&" N'"&title_jpn&"' ,"  
-      sql=sql&" '"&sub_title&"' ,"  
-      sql=sql&" '"&sub_title_eng&"' ,"  
-      sql=sql&" N'"&sub_title_chn&"' ,"  
-      sql=sql&" N'"&sub_title_jpn&"' ,"  
-      sql=sql&" '"&mail_body&"' ,"  
-      sql=sql&" '"&mail_body_eng&"' ,"  
-      sql=sql&" '"&mail_body_chn&"' ,"  
-      sql=sql&" '"&mail_body_jpn&"' ,"  
-      sql=sql&" '"&lms_body&"' ,"  
-      sql=sql&" '"&kakao_body&"' ,"  
+      sql=sql&" '"&dbstr(title_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(title_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(title_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(sub_title)&"' ,"  
+      sql=sql&" '"&dbstr(sub_title_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(sub_title_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(sub_title_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(mail_body)&"' ,"  
+      sql=sql&" '"&dbstr(mail_body_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(mail_body_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(mail_body_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(lms_body)&"' ,"  
+      sql=sql&" '"&dbstr(kakao_body)&"' ,"  
       sql=sql&" '"&due_date&"' ,"  
       sql=sql&" '"&due&"' ,"  
       sql=sql&" '"&mail_flag&"' ,"  
@@ -57,6 +58,7 @@ if noti_id="" then noti_id=0
       sql=sql&" '"&exeOption&"' ,"  
       sql=sql&" '"&admin_id&"' "  
       response.write sql
+
 	  set rs=getRs(sql)
 	'  response.write rs.recordcount
 		if exeOption="D" then
