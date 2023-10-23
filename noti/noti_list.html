@@ -47,83 +47,110 @@
 				<li>due_date: 발송일 지정, due 발송차수 지정 1~6 (차수별 발송시간은 차후설정)</li>
 			</ul>
 			<h1 style="display: inline-block;">NOTIFICATION LIST </h1>
-			
-            <%
-			noti_id=0   
-			admin_id="mars1030"
-            exeOption="V"
+			 <b><a href="get_noti_form.html" class="btn2 biggest">새로 작성하기</a></b><br>
 
-            
-            itemsPage=10
+            <% 
+            itemsPage=5
             set rsIdNum=getRs("select COUNT(noti_id) as a from TB_NOTI_MASTER")
             totalCount=rsIdNum("a")
             totalPageC=Int(totalCount/itemsPage)
             If rsIdNum("a") Mod itemsPage <> 0 Then totalPageC=totalPageC+1
-            If curPage = "" Then curPage = 1 
-
-            ' Set the current page number
             If Request.QueryString("page") <> "" Then 
-                currentPage = Request.QueryString("page") 
+                curPage = Request.QueryString("page") 
             Else 
-                currentPage = 1 
+                curPage = 1 
             End If
 
             sRow=(curPage-1)*itemsPage+1
-            eRos=sRow+itemsPage-1
-            sqlPage="WITH Results AS (SELECT ROW_NUMBER() OVER(ORDER BY noti_id DESC) AS Row, * FROM TB_NOTI_MASTER) SELECT * FROM Results WHERE Row >= " & sRow & " AND Row <= " & eRos             
-            set rsPage=getRs(sqlPage)
+            eRow=sRow+itemsPage-1
+		
+			' 변수들의 값 확인하기(숫자 확인 함 )
+			Response.Write "<h4>페이징 sql 값 확인중<h4><br>"
+			Response.Write "Items per page: " & itemsPage & "<br>"
+			Response.Write "Total count: " & totalCount & "<br>"
+			Response.Write "Total pages: " & totalPageC & "<br>"
+			Response.Write "Current page: " & curPage & "<br>"
+			Response.Write "Start row: " & sRow & "<br>"
+			Response.Write "End row: " & eRow & "<br>"
 
+            sqlPage="WITH Results AS (SELECT ROW_NUMBER() OVER(ORDER BY noti_id DESC) AS Row, * FROM TB_NOTI_MASTER) SELECT * FROM Results WHERE Row >= " & sRow & " AND Row <= " & eRow             
+			set rsPage=getRs(sqlPage)
 			
-		    ' SQL 넣기
-		    sql="ANG_USP_NOTI_INFO_SAVE "
-			sql=sql&" "&noti_id&" ,"
-			sql=sql&" '"&title&"' ,"  
-			sql=sql&" '"&title_eng&"' ,"  
-			sql=sql&" '"&title_chn&"' ,"  
-			sql=sql&" '"&title_jpn&"' ,"  
-			sql=sql&" '"&sub_title&"' ,"  
-			sql=sql&" '"&sub_title_eng&"' ,"  
-			sql=sql&" '"&sub_title_chn&"' ,"  
-			sql=sql&" '"&sub_title_jp&"' ,"  
-			sql=sql&" '"&mail_body&"' ,"  
-			sql=sql&" '"&mail_body_eng&"' ,"  
-			sql=sql&" '"&mail_body_chn&"' ,"  
-			sql=sql&" '"&mail_body_jpn&"' ,"  
-			sql=sql&" '"&lms_body&"' ,"  
-			sql=sql&" '"&kakao_body&"' ,"  
-			sql=sql&" '"&due_date&"' ,"  
-			sql=sql&" '"&due&"' ,"  
-			sql=sql&" '"&mail_flag&"' ,"  
-			sql=sql&" '"&lms_flag&"' ,"  
-			sql=sql&" '"&fcm_flag&"' ,"  
-			sql=sql&" '"&kakao_flag&"' ,"  
-			sql=sql&" '"&sent_date&"' ,"  
-			sql=sql&" '"&results&"' ,"  
-			sql=sql&" '"&exeOption&"' ,"  
-			sql=sql&" '"&admin_id&"' "  
-            sql=sql& ""
-			set rs=getRs(sql)
-            '<a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "&exeOption=" & rs.Fields("exeOption").Value & "'>
-            %>
-            <a href="get_noti_form.html">새로 작성하기</a>
-            <%
-			Response.Write "<br><table class='table_datagrid'>"
-				'제목
-				While Not rs.EOF 
+
+			' 디버깅 정보 출력: SQL 쿼리 문자열 및 결과 집합 상태 확인하기
+			Response.Write sqlPage &"<br>" 
+			If rsPage.EOF Then 
+				Response.write ("결과없음")
+			Else 
+				Response.Write "<br><table class='table_datagrid'>"
+				 While Not rsPage.EOF   
 					Response.Write "<tr>"
-					Response.Write "<th>" & rs("noti_id")& "</th>"
-					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs("noti_id")& "&exeOption='>" & rs("title") & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs.Fields("noti_id").Value & ");'>DEL</a></td>"
+					Response.Write "<th>" & rsPage("noti_id")& "</th>"
+					Response.Write "<td><a href='get_noti_form.html?noti_id=" & rsPage("noti_id")& "&exeOption='>" & rsPage("title") & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rsPage("noti_id").Value & ");'>DEL</a></td>"
 					Response.Write "</tr>"
-					rs.MoveNext      
-				Wend
-			Response.Write "</table>"
-			Response.Write ("<h1>"& action &"</h1>")
-            
+					rsPage.MoveNext      
+				Wend   
+				Response.Write "</table>"
+			End If 
+
+			' noti_id=0   
+			' admin_id="mars1030"
+            ' exeOption="V"
+			
+		    ' ' SQL 넣기
+		    ' sql="ANG_USP_NOTI_INFO_SAVE "
+			' sql=sql&" "&noti_id&" ,"
+			' sql=sql&" '"&title&"' ,"  
+			' sql=sql&" '"&title_eng&"' ,"  
+			' sql=sql&" '"&title_chn&"' ,"  
+			' sql=sql&" '"&title_jpn&"' ,"  
+			' sql=sql&" '"&sub_title&"' ,"  
+			' sql=sql&" '"&sub_title_eng&"' ,"  
+			' sql=sql&" '"&sub_title_chn&"' ,"  
+			' sql=sql&" '"&sub_title_jp&"' ,"  
+			' sql=sql&" '"&mail_body&"' ,"  
+			' sql=sql&" '"&mail_body_eng&"' ,"  
+			' sql=sql&" '"&mail_body_chn&"' ,"  
+			' sql=sql&" '"&mail_body_jpn&"' ,"  
+			' sql=sql&" '"&lms_body&"' ,"  
+			' sql=sql&" '"&kakao_body&"' ,"  
+			' sql=sql&" '"&due_date&"' ,"  
+			' sql=sql&" '"&due&"' ,"  
+			' sql=sql&" '"&mail_flag&"' ,"  
+			' sql=sql&" '"&lms_flag&"' ,"  
+			' sql=sql&" '"&fcm_flag&"' ,"  
+			' sql=sql&" '"&kakao_flag&"' ,"  
+			' sql=sql&" '"&sent_date&"' ,"  
+			' sql=sql&" '"&results&"' ,"  
+			' sql=sql&" '"&exeOption&"' ,"  
+			' sql=sql&" '"&admin_id&"' "  
+            ' sql=sql& ""
+			' set rs=getRs(sql)
+            ' '<a href='get_noti_form.html?noti_id=" & rs.Fields("noti_id").Value & "&exeOption=" & rs.Fields("exeOption").Value & "'>
+            ' ' %>
+			<%
+			' Response.Write "<br><table class='table_datagrid'>"
+			' 	'제목
+			' 	While Not rs.EOF 
+			' 		Response.Write "<tr>"
+			' 		Response.Write "<th>" & rs("noti_id")& "</th>"
+			' 		Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs("noti_id")& "&exeOption='>" & rs("title") & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs("noti_id").Value & ");'>DEL</a></td>"
+			' 		Response.Write "</tr>"
+			' 		rs.MoveNext      
+			' 	Wend
+			' Response.Write "</table>"
+			' Response.Write ("<h1>"& action &"</h1>")
+			' rs.Close
+			' set rs=Nothing
+			
+           
             Response.Write ("<div class='page'>")
-            For i = 1 To totalCount 
+            For i = 1 To totalPageC 
                     Response.Write "<a href='?page=" & i & "'>" & i & "</a> "
                 Next
                 Response.Write "</div>"
+			rsPage.Close
+			set rsPage=Nothing
 
 			%>
 		</body>

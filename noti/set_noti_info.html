@@ -9,27 +9,151 @@ if noti_id="" then noti_id=0
     title_chn = Request.Form("title_chn")
     title_jpn = Request.Form("title_jpn")
     title_jpn = Request.Form("title_jpn")
+
     sub_title = Request.Form("sub_title")
     sub_title_eng = Request.Form("sub_title_eng")
     sub_title_chn = Request.Form("sub_title_chn")
     sub_title_jpn = Request.Form("sub_title_jpn")
+    
     mail_body = Request.Form("mail_body")
     mail_body_eng = Request.Form("mail_body_eng")
     mail_body_chn = Request.Form("mail_body_chn")
     mail_body_jpn = Request.Form("mail_body_jpn")
     lms_body = Request.Form("lms_body")
     kakao_body = Request.Form("kakao_body")
+    
     due_date = Request.Form("due_date")
-    due = Request.Form("due")
-    mail_flag = Request.Form("mail_flag")
-    lms_flag = Request.Form("lms_flag")
-    fcm_flag = Request.Form("fcm_flag")
-    kakao_flag = Request.Form("kakao_flag")
+    'due_flag=1
+    for each i in Array(10, 11, 12, 1, 2, 3, 4 ,5 ,6)
+    if Request.form("due")=cstr(i) then 
+        due=i
+        exit for 
+    end if 
+    next
+    ' due = Request.Form("due")
+     mail_flag = Request.Form("mail_flag")
+     lms_flag = Request.Form("lms_flag")
+     fcm_flag = Request.Form("fcm_flag")
+     kakao_flag = Request.Form("kakao_flag")
     sent_date = Request.Form("sent_date")
     results = Request.Form("results")
     exeOption = Request.Form("exeOption")
     admin_id = "mars1030"
+'end if 
 
+    sql="ANG_USP_NOTI_INFO_SAVE "
+      sql=sql&" "&noti_id&" ,"
+      sql=sql&" '"&dbstr(title)&"' ,"  
+      sql=sql&" '"&dbstr(title_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(title_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(title_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(sub_title)&"' ,"  
+      sql=sql&" '"&dbstr(sub_title_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(sub_title_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(sub_title_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(mail_body)&"' ,"  
+      sql=sql&" '"&dbstr(mail_body_eng)&"' ,"  
+      sql=sql&" N'"&dbstr(mail_body_chn)&"' ,"  
+      sql=sql&" N'"&dbstr(mail_body_jpn)&"' ,"  
+      sql=sql&" '"&dbstr(lms_body)&"' ,"  
+      sql=sql&" '"&dbstr(kakao_body)&"' ,"  
+      sql=sql&" '"&due_date&"' ,"  
+      sql=sql&" '"&due&"' ,"  
+      sql=sql&" '"&mail_flag&"' ,"  
+      sql=sql&" '"&lms_flag&"' ,"  
+      sql=sql&" '"&fcm_flag&"' ,"  
+      sql=sql&" '"&kakao_flag&"' ,"  
+      sql=sql&" '"&sent_date&"' ,"  
+      sql=sql&" '"&results&"' ,"  
+      sql=sql&" '"&exeOption&"' ,"  
+      sql=sql&" '"&admin_id&"' "  
+      response.write sql
+	  set rs=getRs(sql)
+
+%>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="http://mdev.gvg.co.kr/css/master.css" />
+    <link
+      rel="stylesheet"
+      href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="http://mdev.gvg.co.kr/css/datatables.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <style>
+      .table_datagrid td {
+        text-align: left;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/datatables.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/fixeddatatable.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://mdev.gvg.co.kr/jquery/jquery.form.js"
+    ></script>
+    <script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
+    <script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
+    
+    </head>
+
+  <body>
+  <form id="formNoti" method="POST" action="get_noti_form.html">
+    <table>
+      <tr>
+        <th>예약시간</th>
+        <td id="radioGroup">
+          <% 
+          hours=Array(10, 11, 12, 1, 2, 3, 4 ,5 ,6)
+          For Each i In hours
+            Response.Write("<input type='radio' name='due' id='due" & i & "' value='" & i & "'")
+            If due = i Then Response.Write(" checked")
+            Response.Write(">")
+            Response.Write("<label for ='due" & i & "' style='display:inline-block;'>" & i & "시</label>")
+          Next
+          %>                     
+        </td>
+      </tr>
+
+      <% 
+   flags = Array("mail", "lms", "fcm", "kakao")
+        For Each flag In flags
+            Response.Write("<tr>")
+            Response.Write("<th>" & flag & "_체크</th>")
+            Response.Write("<td style='width: 0px;'><input class='flag_checkbox' type='checkbox' name='" & flag & "_flag' id='" & flag & "_flag' value='1' checked></td>")
+            Response.Write("</tr>")
+        Next
+        TodayDate = Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-" & Right("0" & Day(Date()), 2)
+        %>
+
+        <tr>
+            <th>예약날짜</th>
+            <td><input type="date" name="due_date" value="<%=TodayDate%>"></td>
+        </tr>
+
+    </table>
+  </form>
+</body>
+</html>
 
  sql="ANG_USP_NOTI_INFO_SAVE "
       sql=sql&" "&noti_id&" ,"
@@ -58,10 +182,11 @@ if noti_id="" then noti_id=0
       sql=sql&" '"&exeOption&"' ,"  
       sql=sql&" '"&admin_id&"' "  
       response.write sql
-
 	  set rs=getRs(sql)
-	'  response.write rs.recordcount
-		if exeOption="D" then
+%>
+
+  <%
+    	if exeOption="D" then
 			response.redirect "noti_list.html"
 		else	
 		 	response.redirect "get_noti_form.html?noti_id="&rs("noti_id")
@@ -69,4 +194,6 @@ if noti_id="" then noti_id=0
 	  
  	  rs.Close
  	  set rs=nothing
-%>
+  
+  %>
+

@@ -77,16 +77,16 @@ if cint(noti_id) >0 then
     sql=sql&" "&noti_id&" ,"
     sql=sql&" '"&dbstr(title)&"' ,"  
     sql=sql&" '"&dbstr(title_eng)&"' ,"  
-    sql=sql&" '"&dbstr(title_chn)&"' ,"  
-    sql=sql&" '"&dbstr(title_jpn)&"' ," 
+    sql=sql&" N'"&dbstr(title_chn)&"' ,"  
+    sql=sql&" N'"&dbstr(title_jpn)&"' ," 
     sql=sql&" '"&dbstr(sub_title)&"' ,"  
     sql=sql&" '"&dbstr(sub_title_eng)&"' ,"  
-    sql=sql&" '"&dbstr(sub_title_chn)&"' ,"  
-    sql=sql&" '"&dbstr(sub_title_jpn)&"' ,"  
+    sql=sql&" N'"&dbstr(sub_title_chn)&"' ,"  
+    sql=sql&" N'"&dbstr(sub_title_jpn)&"' ,"  
     sql=sql&" '"&dbstr(mail_body)&"' ,"  
     sql=sql&" '"&dbstr(mail_body_eng)&"' ,"  
-    sql=sql&" '"&dbstr(mail_body_chn)&"' ,"  
-    sql=sql&" '"&dbstr(mail_body_jpn)&"' ,"  
+    sql=sql&" N'"&dbstr(mail_body_chn)&"' ,"  
+    sql=sql&" N'"&dbstr(mail_body_jpn)&"' ,"  
     sql=sql&" '"&dbstr(lms_body)&"' ,"  
     sql=sql&" '"&dbstr(kakao_body)&"' ,"  
     sql=sql&" '"&due_date&"' ,"  
@@ -107,30 +107,30 @@ if cint(noti_id) >0 then
 			title_eng=rs("title_eng")  	
 			title_chn=rs("title_chn")  	
 			title_jpn=rs("title_jpn")  	
-            sub_title=rs("sub_title")  	
+      sub_title=rs("sub_title")  	
 			sub_title_eng=rs("sub_title_eng")  	
 			sub_title_chn=rs("sub_title_chn")  	
 			sub_title_jpn=rs("sub_title_jpn")  	
-            mail_body=rs("mail_body")  	
+      mail_body=rs("mail_body")  	
 			mail_body_eng=rs("mail_body_eng")  	
 			mail_body_chn=rs("mail_body_chn")  	
 			mail_body_jpn=rs("mail_body_jpn")  	
-            lms_body=rs("lms_body")  	
+      lms_body=rs("lms_body")  	
 			kakao_body=rs("kakao_body")  	
 			due_date=rs("due_date")  	
-            due=rs("due")  	
+      due=rs("due")  	
 			mail_flag=rs("mail_flag")  	
 			lms_flag=rs("lms_flag")  	
 			fcm_flag=rs("fcm_flag")  	
-            kakao_flag=rs("kakao_flag")  	
+      kakao_flag=rs("kakao_flag")  	
 			sent_date=rs("sent_date")  	
-            '왜 안되지???
+      '왜 안되지???
 			'results=rs("results")  	
 			'exeOption=rs("exeOption")  	
             'admin_id=rs("admin_id")  	
 			response.write title
 
-            response.write ("<h1>due: "& due &"</h1>")
+            response.write ("<h1>due: "& results &"</h1>")
 		end if 	
 	  rs.Close
 	  set rs=Nothing
@@ -139,7 +139,23 @@ end if
 %>
 <script>
     $(document).ready(function() {
-        setRadio(6);
+       var button = $('#saveBtn');
+
+    $(window).scroll(function() {
+        var scrollPos = $(this).scrollTop();
+        if (scrollPos >= 200) { 
+            button.css({
+                'position': 'fixed', 
+                'right': '50px', 
+                'bottom': '377px'
+            });
+        } else { 
+            button.css({
+                'position': 'absolute', 
+                'top': ''
+            });
+        }
+    });
     });
 
 	function fnSubmit(exeOption){
@@ -151,32 +167,11 @@ end if
 		}
 	}
     
-
-    function setRadio(num){
-        var due="<%=due%>"
-    var td = $('#radioGroup');
-    for (var i = 1; i <= num; i++) {
-        var radioButton = $('<input>', {
-            type: 'radio', 
-            id:`due${i}`,
-            class: `due`,
-            name: 'due',
-            value: `${i}`,
-            style: 'display:inline-block;',
-            checked: i === due ? true : false 
-        })
-        var label = $('<label>', {for: `due${i}`, style: 'display:inline-block;'}).text(`${i}시`);
-        
-        td.append(radioButton);
-        td.append(label);
-        td.append("&nbsp; &nbsp; &nbsp;");
-    }
-}
 </script>
 <form id="formNoti"  method="POST" action="set_noti_info.html" >
             <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
-            <a class="btn2 biggest" onclick="fnSubmit('');">SAVE</a>
-            <a class="btn4 biggest" onclick="fnSubmit('');">ADD</a>
+           <a id="saveBtn" class="btn2 biggest" onclick="fnSubmit('');" style="position: absolute; top: 50px; right: 100px;">SAVE</a>
+            <b><a class="btn2 biggest" href="get_noti_form.html">새로 작성하기</a></b>
             <a class="btn3 biggest" onclick="fnSubmit('D');">DEL</a>
             <a class="btn1 biggest" href="noti_list.html">LIST</a>
             <table class="table_datagrid">
@@ -247,26 +242,28 @@ end if
                 <tr >
                     <th>예약시간</th>
                     <td id="radioGroup">
-                     <input type="radio" name="due" id="due11" value="11">
-                    <label for ="due11" style="display:inline-block;">11시</label>
-                     <input type="radio" name="due" id="due12" value="12">
-                    <label for =due12 style="display:inline-block;">12시</label>
+                    <%
+                    hours=Array(10, 11, 12, 1, 2, 3, 4, 5, 6)
+                    For Each i In hours
+                        Response.Write("<input type='radio' name='due' id='due" & i & "' value='" & i & "'")
+                        If due = i Then Response.Write(" checked")
+                        Response.Write(">")
+                        Response.Write("<label for ='due" & i & "' style='display:inline-block;'>" & i & "시</label>")
+                    Next
+                    %>                     
                     </td>
                 </tr>
-                <tr >
-                    <th>메일_체크</th>
-                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="mail_flag" id="mail_flag" value="1" <% if mail_flag = 1 then %> checked <% end if %>></td>
-                    <th>LMS_체크</th>
-                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="lms_flag" id="lms_flag" value="1" <% if lms_flag = 1 then %> checked <% end if %>></td>
-                    
-                </tr>
-                <tr>
-                  <th>Push_체크</th>
-                  <td>
-                  <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="fcm_flag" id="fcm_flag" value="1" <% if fcm_flag = 1 then %> checked <% end if %>></td>
-                  <th>카카오_체크</th>
-                    <td style="width: 0px;"><input class="flag_checkbox" type="checkbox" name="kakao_flag" id="kakao_flag" value="1" <% if kakao_flag = 1 then %> checked <% end if %>></td>
-                </tr>
+               <%
+                  flags = Array("mail", "lms", "fcm", "kakao")
+                  For Each flag In flags
+                      Response.Write("<tr>")
+                      Response.Write("<th>" & flag & "_체크</th>")
+                      Response.Write("<td style='width: 0px;'><input class='flag_checkbox' type='checkbox' name='" & flag & "_flag' id='" & flag & "_flag' value='1'")
+                      If Eval(flag & "_flag") = 1 Then Response.Write(" checked")
+                      Response.Write("></td>")
+                      Response.Write("</tr>")
+                  Next
+                  %>
                 <tr>
                     <th>실제 전송날짜</th>
                     <td><input type="datetime" name="sent_date" id="sent_date" readonly value="<%=sent_date%>"></td>
