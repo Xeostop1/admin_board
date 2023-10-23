@@ -69,7 +69,13 @@
       admin_id="mars1030"
       exeOption="V"
 
-      			
+'디폴트 세팅
+    mail_flag="1"
+    lms_flag="1"
+    fcm_flag="1"
+    kakao_flag="1"
+    due_date=date
+
 ' SQL 넣기
 'noti_id 가 넘어온 경우 기존 정보를 select   /nvarchar N넣기      
 if cint(noti_id) >0 then
@@ -265,6 +271,11 @@ end if
                   Next
                   %>
                 <tr>
+                    <th>파일 업로드</th>
+                    <td><input type="file" name="file" id="file"></td>
+                </tr>
+
+                <tr>
                     <th>실제 전송날짜</th>
                     <td><input type="datetime" name="sent_date" id="sent_date" readonly value="<%=sent_date%>"></td>
                 </tr>
@@ -284,3 +295,38 @@ end if
     </form>
   </body>
 </html>
+
+<!--
+table
+'tb_noti_files
+key: id, noti_id
+id,
+dir_code,
+noti_id,
+file_name,
+file_link (/store/2023fallsale),
+file_desc,
+file_desc_eng,
+file_desc_chn,
+file_desc_jpn,
+http,
+file_title,
+file_title_eng,
+file_title_chn,
+file_title_jpn,
+file_title,
+sort, 
+sysdate
+
+1. 파일명 저장, thumbnail 표시 
+2. 파일상세정보수정 popup
+3. sorting 가능
+
+
+-->
+
+
+
+
+
+	
