@@ -70,6 +70,7 @@
       exeOption="V"
 
 '디폴트 세팅
+    due=12
     mail_flag="1"
     lms_flag="1"
     fcm_flag="1"
@@ -145,25 +146,26 @@ end if
 %>
 <script>
     $(document).ready(function() {
-       var button = $('#saveBtn');
-
-    $(window).scroll(function() {
-        var scrollPos = $(this).scrollTop();
-        if (scrollPos >= 200) { 
-            button.css({
-                'position': 'fixed', 
-                'right': '50px', 
-                'bottom': '377px'
-            });
-        } else { 
-            button.css({
-                'position': 'absolute', 
-                'top': ''
-            });
-        }
+      var button = $('#saveBtn');
+      $(window).scroll(function() {
+          var scrollPos = $(this).scrollTop();
+          if (scrollPos >= 200) { 
+              button.css({
+                  'position': 'fixed', 
+                  'right': '50px', 
+                  'bottom': '377px'
+              });
+          } else { 
+              button.css({
+                  'position': 'absolute', 
+                  'top': ''
+              });
+          }
+      });
+      
+    $("#file").change(showImages);
     });
-    });
-
+//**** submit*****
 	function fnSubmit(exeOption){
 		$('#exeOption').val(exeOption);
 		var flag=false;
@@ -172,7 +174,28 @@ end if
 			$('#formNoti').submit();
 		}
 	}
-    
+
+function showImages(e){
+    $("#imgCon").empty()
+     $.each(e.target.files, function(i, file) {
+         if(file.type.match('image.*')) { 
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = $("<img>", {src: e.target.result, width: 100, height: 100});
+                var noti_id = $("#noti_id").val();
+                img[0].onclick =()=> 
+                    window.open("get_file_form.html?noti_id=" + noti_id + "&file_name=" + encodeURIComponent(file.name), "_blank", "height=700,width=500,scrollbars=no");
+                $("#imgCon").append(img);
+            }
+            reader.readAsDataURL(file);
+         }
+     });
+}
+
+
+
+
+
 </script>
 <form id="formNoti"  method="POST" action="set_noti_info.html" >
             <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
@@ -272,9 +295,11 @@ end if
                   %>
                 <tr>
                     <th>파일 업로드</th>
-                    <td><input type="file" name="file" id="file"></td>
+                    <td>
+                      <input type="file" accept="image/*" id="file" multiple>
+                        <div id="imgCon" style="width: 100%; min-height: 200px;"></div>
+                    </td>
                 </tr>
-
                 <tr>
                     <th>실제 전송날짜</th>
                     <td><input type="datetime" name="sent_date" id="sent_date" readonly value="<%=sent_date%>"></td>
@@ -314,7 +339,6 @@ file_title,
 file_title_eng,
 file_title_chn,
 file_title_jpn,
-file_title,
 sort, 
 sysdate
 

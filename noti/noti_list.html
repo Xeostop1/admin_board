@@ -1,0 +1,96 @@
+<%@Language=VBScript CodePage=65001%>
+<!--#include virtual=/sb/inc/vbutil.inc-->
+<!--#include virtual=/inc/classes/notification.asp-->
+<%
+  Response.CodePage = 65001
+  Response.CharSet = "utf-8"
+page=request("page")
+if page="" then page="1"
+
+%>
+<html>
+	<head>
+			<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+			<link rel="stylesheet" href="http://mdev.gvg.co.kr/css/master.css">
+			<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+			<link rel="stylesheet" type="text/css" href="http://mdev.gvg.co.kr/css/datatables.min.css"/>
+ 			<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+ 			<style>
+	 			.table_datagrid td{text-align:left;}
+	 		</style>
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+			<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+			<script type="text/javascript" src="http://mdev.gvg.co.kr/jquery/datatables.min.js"></script>
+			<script type="text/javascript" src="http://mdev.gvg.co.kr/jquery/fixeddatatable.js"></script>
+			<script type="text/javascript" src="http://mdev.gvg.co.kr/jquery/jquery.form.js"></script>
+			<script src="http://mdev.gvg.co.kr/jquery/onload.js"></script>
+			<script src="http://mdev.gvg.co.kr/jquery/master.js"></script>
+			
+            <script>
+            
+				function fnSubmit(noti_id) {
+					var r = confirm("삭제?");
+					if (r == true) {
+							$.get('del_noti_info.html', { noti_id: noti_id })
+								.done(function(response) {
+									location.reload();
+								})
+								.fail(function(response) {
+									alert("삭제 실패");
+								});
+						}
+				}
+			</script>
+		</head>
+		<body>
+			<ul class="manual">
+				<li>tb_noti_master 에 기본정보 입력화면 구성</li>
+				<li>*_flag 필드는 1/0 1:발송 0:제외</li>
+				<li>due_date: 발송일 지정, due 발송차수 지정 1~6 (차수별 발송시간은 차후설정)</li>
+			</ul>
+			<h1 style="display: inline-block;">NOTIFICATION LIST </h1>
+			 <b><a href="set_noti_form.html" class="btn2 biggest">새로 작성하기</a></b><br>
+            <% 
+            '===============
+            'sql="ang_usp_noti_info_select 0,'mars1030' "
+            set myNoti=new Notification
+            	myNoti.noti_id=0
+            	set rs=myNoti.selectNotiInfo
+'            	myNoti.saveNotiInfo
+'            set rs=getRs(sqlPage)
+'            set rs=getsp_by_conn(getconnection(),sql)
+			Response.Write sqlPage &"<br>" 
+			If rs.EOF Then 
+				Response.write ("결과없음")
+			Else
+                'paging setting
+                pagesize=4
+                rs.pagesize=pagesize
+                rs.absolutepage=page
+                totalpage=rs.pagecount 
+				
+            Response.Write "<br><table class='table_datagrid'>"
+            i=1
+                do until rs.EOF  or cint(i) > cint(pagesize)
+                Response.Write "<tr>"
+                Response.Write "<th>" & rs("noti_id")& "</th>"
+                Response.Write "<td><a href='get_noti_form.html?noti_id=" & rs("noti_id")& "&exeOption='>" & rs("title") & "</a> <a class='btn3 biggest' onclick='fnSubmit(" & rs("noti_id").Value & ");'>DEL</a></td>"
+                Response.Write "</tr>"
+                rs.MoveNext      
+                i=i+1
+            loop
+            Response.Write "</table>"
+			End If           
+			
+            Response.Write "<div class='page' style='text-align: center;'><br>"
+            For i = 1 To totalPage
+                Response.Write "<h1 style='display:inline-block;'><a href='?page=" & i & "'>" & i & "</a></h1> "
+            Next
+                Response.Write "</div>"
+			rs.Close
+			set rs=Nothing
+			set myNoti=Nothing
+			%>
+		</body>
+</html>

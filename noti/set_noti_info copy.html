@@ -2,25 +2,27 @@
 <!--#include virtual=/sb/inc/vbutil.inc-->
 <%
 ' nvarchar N넣기  
-noti_id = Request.Form("noti_id")
-if noti_id="" then noti_id=0
-    title = Request.Form("title")
-    title_eng = Request.Form("title_eng")
-    title_chn = Request.Form("title_chn")
-    title_jpn = Request.Form("title_jpn")
-    title_jpn = Request.Form("title_jpn")
 
-    sub_title = Request.Form("sub_title")
-    sub_title_eng = Request.Form("sub_title_eng")
-    sub_title_chn = Request.Form("sub_title_chn")
-    sub_title_jpn = Request.Form("sub_title_jpn")
-    
-    mail_body = Request.Form("mail_body")
-    mail_body_eng = Request.Form("mail_body_eng")
-    mail_body_chn = Request.Form("mail_body_chn")
-    mail_body_jpn = Request.Form("mail_body_jpn")
-    lms_body = Request.Form("lms_body")
-    kakao_body = Request.Form("kakao_body")
+noti_id=Request("noti_id")
+
+  noti_id = Request.Form("noti_id")
+  title = Request.Form("title")
+  title_eng = Request.Form("title_eng")
+  title_chn = Request.Form("title_chn")
+  title_jpn = Request.Form("title_jpn")
+  title_jpn = Request.Form("title_jpn")
+
+  sub_title = Request.Form("sub_title")
+  sub_title_eng = Request.Form("sub_title_eng")
+  sub_title_chn = Request.Form("sub_title_chn")
+  sub_title_jpn = Request.Form("sub_title_jpn")
+  
+  mail_body = Request.Form("mail_body")
+  mail_body_eng = Request.Form("mail_body_eng")
+  mail_body_chn = Request.Form("mail_body_chn")
+  mail_body_jpn = Request.Form("mail_body_jpn")
+  lms_body = Request.Form("lms_body")
+  kakao_body = Request.Form("kakao_body")
     
     due_date = Request.Form("due_date")
     'due_flag=1
