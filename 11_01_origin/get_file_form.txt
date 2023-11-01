@@ -1,0 +1,90 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/classes/notification.asp-->
+<script src="/jquery/noti.js"></script>
+
+    <ul class="manual">
+      <li>파일이름과 설명을 수정해 주세요 </li>
+    </ul>
+    <%
+        noti_id = Request("noti_id")
+        file_id = Request("file_id")
+        'Response.Write "noti_id: " & noti_id 
+        'Response.Write "<br>file_name: " & file_id 
+        set myFiles=new Notification
+
+		myFiles.noti_id=noti_id
+		myFiles.file_id=file_id
+		myFiles.file_link=file_link
+		
+        myFiles.file_title=file_title
+		myFiles.file_title_eng=file_title_eng
+		myFiles.file_title_chn=file_title_chn
+		myFiles.file_title_jpn=file_title_jpn
+		
+        myFiles.file_desc=file_desc
+		myFiles.file_desc_eng=file_desc_eng
+		myFiles.file_desc_chn=file_desc_chn
+		myFiles.file_desc_jpn=file_desc_jpn
+		
+		set rs=myFiles.selectFileInfo()
+		
+    
+    %>
+    <script>
+		  function fnEditFile(){
+            
+			 var form=$('#formFile');
+			 var result=mFnEditFile(form);
+			 //var result='OK';
+			 result=='OK'? $('#myModal').hide():alert(result);
+		 }
+         $('textarea').attr({
+            'rows': '10',
+            'cols': '40'
+        });
+        $('#formFile input').css({
+            'width':'272px',
+            'margin-bottom': '2px'
+        });
+
+    </script>
+
+
+<form id="formFile">
+	<input type="hidden" name="noti_id" value="<%=noti_id%>">
+	<input type="hidden" name="file_id" value="<%=file_id%>">
+    <a style="float:inline-end; margin-right:300px;" class="btn2 biggest" onclick="fnEditFile()">SAVE</a>
+            <table class="table_datagrid">
+               <tr>
+                    <th>파일링크 </th>
+                    <td>  
+                        <input type="text" id="file_link" name="file_link"  value="<%=rs("file_link")%>">
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <th>파일명</th>
+                    <td>
+                        <input type="text" id="file_title" name="file_title" placeholder="파일명" value="<%=rs("file_title")%>" ><br>
+                        <input type="text" id="file_title_eng" name="file_title_eng" placeholder="영문_파일명" value="<%=rs("file_title_eng")%>"><br>
+                        <input type="text" id="file_desc_chn" name="file_desc_chn" placeholder="중문_파일명" value="<%=rs("file_desc_chn")%>"><br>
+                        <input type="text" id="file_title_jpn" name="file_title_jpn" placeholder="일문_파일명" value="<%=rs("file_title_jpn")%>">
+                    </td>
+                </tr>
+                     <tr>
+                    <th>파일설명</th>
+                    <td>  
+                        <textarea id="file_desc" placeholder="파일설명" name="file_desc"><%=rs("file_desc")%></textarea>
+                        <textarea id="file_desc_eng" placeholder="영문_파일설명" name="file_desc_eng"><%=rs("file_desc_eng")%></textarea>
+                        <textarea id="file_desc_chn" placeholder="중문_파일설명"  name="file_desc_chn"><%=rs("file_desc_chn")%></textarea>
+                        <textarea id="file_desc_jpn" placeholder="일문_파일설명"  name="file_desc_jpn"><%=rs("file_desc_jpn")%></textarea>
+                    </td>
+                </tr>
+            </table>     
+    </form>
+<%
+rs.Close
+set rs=Nothing
+set myFiles=Nothing	
+%>
+	

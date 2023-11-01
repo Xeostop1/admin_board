@@ -1,0 +1,83 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/inc/dev/top.inc-->
+<!--#include virtual=/classes/notification.asp-->
+<div class="div_title">
+	<h1>통합 알림 관리</h1>
+</div>
+            <% 
+            '===============
+            set myNoti=new Notification
+            	myNoti.noti_id=0
+            	set rs=myNoti.selectNotiInfo
+				If rs.EOF Then 
+					Response.write ("결과없음")
+				Else
+	                'paging setting
+	                pagesize=10
+	                rs.pagesize=pagesize
+	                rs.absolutepage=page
+	                totalpage=rs.pagecount 
+				
+	            i=1
+	            %>
+				<table class='table_datagrid hovered' >
+	            <tr>
+		                	<th style="width:30px;">No.</th>
+		                	<th style="width:30px;">알림ID</th>
+		                	<th style="width:50px;"></th>
+		                	<th style="width:calc(100% - 200px);text-align:left;">알림 제목</th>
+		                	<th>작성일</th>
+		                	<th>발송지정일</th>
+		                	<th>발송차수</th>
+		                	<th>발송결과</th>
+	            </tr>
+	            <%
+	                do until rs.EOF  or cint(i) > cint(pagesize)
+	                	%>
+	                	<tr>
+		                	<td><%=rs.recordcount-i%></td>
+		                	<td><%=rs("noti_id")%></td>
+		                	<td style="width:50px;">
+			                	<%
+				                	if rs("file_name")<>"" then
+					                	%>
+					                	<div class="thumbnail" style="background-image: url('<%=rs("http")%>/<%=rs("file_name")%>')"></div>
+					                	<%
+				                	end if
+			                	%>
+		                	</td>
+		                	<td style="text-align:left;">
+			                	<a href="get_noti_form.html?noti_id=<%=rs("noti_id")%>">
+				                	<%=rs("title")%>
+			                	</a>	
+			                </td>
+		                	<td><%=rs("sysdate")%></td>
+		                	<td><%=rs("due_date")%></td>
+		                	<td><%=rs("due")%></td>
+		                	<td><%=rs("results")%></td>
+	                	</tr>
+	                	<%
+	' 	                Response.Write "<tr>"
+	' 	                Response.Write "<th style=""width:50px;"">" & rs("noti_id")& "</th>"
+	' 	                Response.Write "<td style=""width:300px;""><a href='get_noti_form.html?noti_id=" & rs("noti_id")& "&exeOption='>" & rs("title") & "</a></td>"
+	' 	                response.write "<td><a class='btn3 biggest' onclick='fnSubmit(" & rs("noti_id").Value & ");'>DEL</a></td>"
+		                'Response.Write "</tr>"
+	                rs.MoveNext      
+	                i=i+1
+	            loop
+	            Response.Write "</table>"
+	            %>
+	            <div class="pd30">
+		            <a href="get_noti_form.html" class="btn2 biggest">새로 작성하기</a></b><br>
+	            </div>
+	            <%
+				page_url="noti_list.html?"
+	            paging
+	            
+				End If           
+				rs.Close
+				set rs=Nothing
+				set myNoti=Nothing
+			%>
+<!--#include virtual=/inc/bottom.inc-->
+
