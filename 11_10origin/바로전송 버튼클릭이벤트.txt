@@ -1,0 +1,37 @@
+ $(".sendNow_btn").click(function(){
+    var noti_id="<%=noti_id%>";
+    var platform='service'
+    var mail_flag="<%=mail_flag%>";
+    var lms_flag="<%=lms_flag%>";
+    var fcm_flag="<%=fcm_flag%>";
+    var notiType=$(this).data('noti-type');
+    alert(notiType)
+     if(confirm('즉시 발송하겠습니까?')){
+	    var result= mFnSendNoti(noti_id,platform,notiType);
+        console.log("발송후 result");
+        console.log(result);
+        console.log(`noti_id: ${noti_id}, platform: ${platform}, notiType: ${notiType}, mail_flag: ${mail_flag}, lms_flag: ${lms_flag}, fcm_flag: ${fcm_flag}`);
+        
+          $.each(result.targets, function(target,value){
+            alert("123")
+            // console.log(result.targets)
+            // console.log(target);
+            // console.log(value);
+             //2 이하 랜더
+             if(notiType.includes(target) && value < 2){
+                 fnRenderTopic(result);
+             }
+          })
+    // if(result.result=='OK'){
+    //         alert("발송완료");
+    //         //화면 리로드
+    //         location.reload(); 
+    //         return noti_id
+    //     }else{
+    //         alert(result.message);
+    //     }
+    // }else{
+    //     alert("발송을 취소하였습니다.")
+    }
+})
+});

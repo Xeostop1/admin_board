@@ -1,0 +1,175 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/classes/notification.asp-->    
+<!--#include virtual=/classes/messages.asp-->    
+<!--#include virtual=/classes/FirebaseMessages.asp-->    
+<!--#include virtual=/classes/emails.asp-->     
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<%	
+noti_id=Request("noti_id")	
+  'noti_id':noti_id,
+pvLang=request("pvLang")
+pvType=request("pvType")
+'noti_id=158
+
+if pvType="" then pvType="email"
+if pvLang="" then pvLang="kr"
+platform=Request("platform")	'service / test
+targets=Request("targets")
+
+
+		'이메일 미리보기 서브루틴
+		sub previewEmail(mailBody,lang)
+			set myEmail = new Emails	
+				myEmail.body=mailBody
+				myEmail.language=pvLang
+				myEmail.attachDeni=1				
+				myEmail.preview		
+
+			set myEmail=Nothing	
+		end sub	
+		
+		sub previewLMS(title,body)
+			set MyLms=new Messages
+				MyLms.assets="/classes/assets"
+				MyLms.title=title
+				MyLms.body=body
+				MyLms.Preview()
+			set MyLms=Nothing
+		end sub	
+		
+		sub previewFCM(title,body,thumbnail)
+			set myFcm=new FirebaseMessages
+				myFcm.assets="/classes/assets"
+				myFcm.title=title
+				myFcm.body=body
+				myFcm.image=thumbnail
+				myFcm.preview()
+			set myFcm=nothing
+		end sub	
+%>
+<style>
+	a.btn{
+		text-decoration: none;
+		display: inline-block;
+		padding:2px 10px 2px 10px;
+		margin: 2px;
+		border:1px solid #aaaaaa;
+		background-color:#ffffff;
+		color:#000000;
+		font-weight: bolder;
+		font-size: 10px;
+		border-radius: 5px;
+	}
+	a.btn.selected{
+		border:1px solid #000000;
+		background-color:#000000;
+		color:#ffffff;
+	}
+	ul.manual{
+		border-radius: 5px;
+		border: 1px solid #7b6a35;
+		display: block;
+		padding: 10px;
+		margin: 10px;
+		background-color:#f2e0a8;
+		list-style:decimal;
+		list-style-position: inside;
+	}
+</style>
+<script src="/jquery/noti.js"></script>
+
+<script>
+	//======발송(테스트 포함)===
+	function fnSendNoti(noti_id,platform,targets,language,notiType){
+		 var noti_id="<%=noti_id%>"
+		 var platform='test'; //실제/테스트 2개
+		 var pvLang="<%=pvLang%>";
+         var pvType="<%=pvType%>";  
+         
+
+		 if(platform === 'test') {
+			var targets_val=document.querySelector("#targets").value;
+            targets = targets_val ? targets_val.split(',').map(item => item.trim()).filter(item => item) : [];
+            console.log(targets)
+			 if(targets.length === 0) alert("값 X");
+		 }
+
+		console.log(`noti_id: ${noti_id}, platform: ${platform}, targets: ${targets}, language: ${pvLang}, notiType: ${pvType}`);
+	    var result= mFnSendNoti(noti_id,platform,targets,pvLang,pvType);
+       if(result.result=='OK'){
+        alert("발송완료");
+        return noti_id
+       }else{
+	       alert(result.message);
+       }
+	}
+</script>
+
+<body style="margin:0;background-color:#eeeeee;">
+
+	<div style="border: 1px solid #ccc;  z-index:1;text-align:center;height:30px;padding:34px;position:fixed;background-color:#eeeeee;width:100%;float:left;">
+		<div style="display:inline-block;">발송수단</div>
+		<a href="?noti_id=<%=noti_id%>&pvType=email&pvLang=<%=pvLang%>" class="btn <%if pvType="email" then response.write " selected "%>">뉴스레터</a>
+		<a href="?noti_id=<%=noti_id%>&pvType=lms&pvLang=<%=pvLang%>" class="btn <%if pvType="lms" then response.write " selected "%>">LMS</a>
+		<a href="?noti_id=<%=noti_id%>&pvType=fcm&pvLang=<%=pvLang%>" class="btn <%if pvType="fcm" then response.write " selected "%>">FCM(앱푸시)</a>
+		<a class="btn <%if pvType="kakao" then response.write " selected "%>">KAKAO</a>
+		
+		<div style="display:inline-block;padding-left:40px;">발송언어</div>
+		<a href="?noti_id=<%=noti_id%>&pvType=<%=pvType%>&pvLang=kr" class="btn <%if pvLang="kr" then response.write " selected "%>">한국어</a>
+		<a href="?noti_id=<%=noti_id%>&pvType=<%=pvType%>&pvLang=en" class="btn <%if pvLang="en" then response.write " selected "%>">ENGLISH</a>
+		<a href="?noti_id=<%=noti_id%>&pvType=<%=pvType%>&pvLang=cn" class="btn <%if pvLang="cn" then response.write " selected "%>">中文</a>
+		<a href="?noti_id=<%=noti_id%>&pvType=<%=pvType%>&pvLang=jp" class="btn <%if pvLang="jp" then response.write " selected "%>">日本語</a>
+            <br>받는사람<input id="targets" style=" margin: 4px 240px 10px 10px; width: 300px; height: 30px;" type="text" placeholder="2개 이상시 ,로 적어주세요" title="2개 이상시 ,로 구분해주세요"  >
+            <a style="margin-right: 50px; cursor: pointer;" id="sendNoti" class="btn" onclick="fnSendNoti()" >전송</a>
+            
+	</div>
+	<div style="height:100px;width:100%;"></div>
+	<ul class="manual" style="width:600px;margin:0 auto;">
+	            <li>메일, 문자 테스트 수신자는 ','로 구분해서 여러명 지정가능</li>
+	            <li>푸시 테스트 수신자는 1명만 지정가능, 앱에 로그인된 아이디</li>
+	            <li>푸시 테스트 전송결과확인 불가</li>
+            </ul>
+	<div style="
+			position:absolute;
+			left: 50%;
+			transform: translate(-50%, 0%);			
+		">
+		<%
+			
+			set myNoti = new Notification
+			myNoti.noti_id=noti_id
+			myNoti.language=pvLang
+			mailBody=myNoti.mailBody
+			
+			if ucase(pvType)="EMAIL" then 
+				set myNotiRs=myNoti.selectNotiInfo
+				call previewEmail(mailBody,pvLang)
+				myNotiRs.Close
+				set myNotiRs=Nothing
+			end if	
+			
+			if ucase(pvType)="LMS" then 
+				set myMap=myNoti.selectInfoMap
+				lms_body="[Web발신]"&chr(13)&chr(10)
+				lms_body=lms_body&"[광고] "
+				lms_body=lms_body&myMap.item("lms_body")
+				lms_body=lms_body&chr(13)&chr(10)
+				lms_body=lms_body&chr(13)&chr(10)
+				lms_body=lms_body&chr(13)&chr(10)&"무료수신거부 0808700855"
+				
+				call previewLMS(myMap.item("lms_title"),lms_body)
+				set myMap=nothing	
+			end if	
+			
+			if ucase(pvType)="FCM" then 
+				set myMap=myNoti.selectInfoMap
+				call previewFCM(myMap.item("title"),myMap.item("sub_title"),myMap.item("thumbnail"))
+				set myMap=nothing	
+			end if	
+			
+		
+		set myNoti=Nothing
+			
+		%>
+	</div>
+</body>

@@ -1,0 +1,173 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/inc/dev/top.inc-->
+<!--#include virtual=/classes/notification.asp-->
+    <ul class="manual">
+      <li>파일을 수정해 주세요 </li>
+      <li>제목과 설명은 모두 4개국어가 필요합니다.</li>
+    </ul>
+    <%
+        noti_id = Request("noti_id")
+        file_name = Request("file_name")
+        admin_id="mars1030"
+        exeOption="V"
+        Response.Write "noti_id: " & noti_id 
+
+    %>
+    <script>
+    $(document).ready(function() {
+        
+      // // 'formNoti' 폼 제출 이벤트 바인딩
+      // $('#formNoti').on('submit', function(e) {
+      //     var isValid = true;
+      //     // 모든 텍스트 입력 필드 순회
+      //     $('#formNoti input[type="text"]').each(function() {
+      //         // 입력 필드 값이 비어 있는지 확인
+      //         if ($.trim($(this).val()) == '') {
+      //             isValid = false;
+      //             // 사용자에게 모든 필드를 채워야 함을 알림
+      //             alert('모든 필드를 채워주세요.');
+      //             return false; // 반복문 종료
+      //         }
+      //     });
+      //     // 비어 있는 필드가 있을 경우 폼 제출 취소
+      //     if (!isValid) {
+      //         e.preventDefault();
+      //     }
+      // });
+      var dummy = ["bts", "ive", "Blackpink", "newjeans"];
+    
+
+  function fnSubmit(exeOption){
+    console.log(exeOption);
+    alert("들어왔습니다")
+    $('#formNoti').submit();
+
+		// $('#exeOption').val(exeOption);
+		// var flag=false;
+		// exeOption=='D'?flag=confirm('지우냐?'):flag=true;
+		// if(flag){
+		// 	$('#formNoti').submit();
+		// }
+	}
+
+    });
+    //idol_id
+    var dummy = ["bts", "ive", "Blackpink", "newjeans"];            
+    function optionSearch(event){
+            var inputVal = $('#idol_id').val().toLowerCase();
+            var datalist = $('#idol_ids');
+            datalist.empty();
+            $.each(dummy, function (i, value) {
+                var debugMessage = "i: " + i + ", value: " + value;
+                if (value.toLowerCase().includes(inputVal)) {
+                    //alert("확인중 " + debugMessage);
+                    var option = $('<option>', { value: value });
+                     option.attr('data-value', value); 
+                    datalist.append(option);
+                }
+            });
+        
+    }
+
+    function checkNum(input) {
+        var inputE=$("#pcs_id")
+        var numVal=inputV.replace(/[^0-9]/g, '');
+        if(numVal.length<=2 && numVal!==inputV){
+            inputE.val(numVal)
+            inputE.focus()
+            inputE.val()=numVal;
+        }
+          
+    }
+
+
+    </script>
+
+<br><a class="btn2 biggest"  onclick="fnSubmit('e');">get_noti_form 저장하고 돌아가기</a>
+<form id="formNoti"  method="POST" action="set_topic_info.html" >
+            <table class="table_datagrid">
+                <tr>
+                  <th>상품코드(숫자만) </th>
+                    <td>  
+                        <input type="text" id="pcs_id" name="pcs_id" oninput="checkNum(event)">
+                    </td>
+                </tr>
+                <!--<tr>
+                    <th>브랜드</th>
+                     <td>  
+                        <b><label for="topic">보낼 대상 선택 </label></b>
+                        <input type="text" list="pcs_makers" id="pcs_maker" >
+                        <datalist id="pcs_makers">
+                            <option data-value="pcs_id">상품코드</option>
+                            <option data-value="pcs_maker">브랜드</option>
+                            <option data-value="idol_id">아이돌</option>
+                            <option data-value="unit_id">유  닛</option>
+                        </datalist>
+                    </td>
+                </tr>
+                <tr>-->
+                    <th>아이돌</th>
+                    <td>  
+                        <b><label for="topic">보낼 대상 선택 </label></b>
+                        <input type="search" list="idol_ids" id="idol_id" oninput="optionSearch(event)" placeholder="아이돌검색">
+                       <datalist id="idol_ids">
+                        <!--    <option data-value="pcs_id">상  품</option>
+                            <option data-value="pcs_maker">브랜드</option>
+                            <option data-value="idol_id">아이돌</option>
+                            <option data-value="unit_id">유  닛</option>
+                        </datalist>-->
+                    </td>
+                </tr>
+                <tr>
+                   <!-- <th>유  닛</th>
+                      <td>  
+                        <b><label for="topic">보낼 대상 선택 </label></b>
+                        <input type="text" list="unit_ids" id="unit_id" >
+                        <datalist id="unit_ids">
+                            <option data-value="pcs_id">상  품</option>
+                            <option data-value="pcs_maker">브랜드</option>
+                            <option data-value="idol_id">아이돌</option>
+                            <option data-value="unit_id">유  닛</option>
+                        </datalist>
+                    </td>-->
+                </tr>
+                <tr>
+                    <th>noti_id_hidden</th>
+                    <td>  
+                        <input type="text" id="noti_id" name="noti_id" value="<%=noti_id%>" readonly >
+                    </td>
+                </tr>
+                 <tr>
+                    <th>noti_id_hidden</th>
+                    <td>  
+                        <input type="text" id="file_name" name="file_name" value="<%=file_name%>" readonly >
+                    </td>
+                </tr>
+            </table>     
+    </form>
+  
+
+<!--
+table
+'tb_noti_files
+key: id, noti_id
+id
+noti_id
+pcs_id
+pcs_maker
+idol_id
+unit_id
+sysdate
+
+1. 파일명 저장, thumbnail 표시 
+2. 파일상세정보수정 popup
+3. sorting 가능
+
+
+-->
+
+
+
+
+
+	

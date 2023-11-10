@@ -1,0 +1,100 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/classes/notification.asp-->
+
+<script src="/jquery/noti.js"></script>
+    <%
+        noti_id = Request("noti_id")
+        file_id = Request("file_id")
+        'Response.Write "noti_id: " & noti_id 
+        'Response.Write "<br>file_name: " & file_id 
+        set myFiles=new Notification
+
+		myFiles.noti_id=noti_id
+		myFiles.file_id=file_id
+		myFiles.file_link=file_link
+		
+        myFiles.file_title=file_title
+		myFiles.file_title_eng=file_title_eng
+		myFiles.file_title_chn=file_title_chn
+		myFiles.file_title_jpn=file_title_jpn
+		
+        myFiles.file_desc=file_desc
+		myFiles.file_desc_eng=file_desc_eng
+		myFiles.file_desc_chn=file_desc_chn
+		myFiles.file_desc_jpn=file_desc_jpn
+		
+		set rs=myFiles.selectFileInfo()
+		
+    
+    %>
+    <script>
+		  function fnEditFile(){
+			 var form=$('#formFile');
+             var file_link=$("#file_link").val();
+             if(file_link!==''){
+                var result=mFnEditFile(form);
+                //var result='OK';
+                result=='OK'? $('#myModal').hide():alert(result);
+             }else{
+                alert("이미지링크는 꼭 필요해요 😉")//링크 꼭 있어야 하는지 물어보기
+                $("#file_link").focus()
+             }
+			
+		 }
+         $('textarea').attr({
+            'rows': '10',
+            'cols': '40'
+        });
+        $('#formFile input').css({
+            'width':'272px',
+            'margin-bottom': '2px'
+        });
+    </script>
+    <style>
+        #wrap{
+            margin: 0 ;
+        }
+    </style>
+
+<div id="wrap">
+<h1>이미지 제목 및 설명</h1>
+
+<form id="formFile">
+	<input type="hidden" name="noti_id" value="<%=noti_id%>">
+	<input type="hidden" name="file_id" value="<%=file_id%>">
+            <table class="table_datagrid">
+               <tr>
+                    <th>이미지링크 </th>
+                    <td>  
+                        <input class="file_des mustinput" type="text" id="file_link" name="file_link"  value="<%=rs("file_link")%>" title="링크는 반드시 입력해야 합니다.">
+                    </td>
+                </tr>
+                <tr>
+                    <th>이미지제목</th>
+                    <td>
+                        <input class="file_des" type="text" id="file_title" name="file_title" placeholder="이미지제목" value="<%=rs("file_title")%>" ><br>
+                        <input class="file_des" type="text" id="file_title_eng" name="file_title_eng" placeholder="영문_이미지제목" value="<%=rs("file_title_eng")%>"><br>
+                        <input class="file_des" type="text" id="file_title_chn" name="file_title_chn" placeholder="중문_이미지제목" value="<%=rs("file_title_chn")%>"><br>
+                        <input class="file_des" type="text" id="file_title_jpn" name="file_title_jpn" placeholder="일문_이미지제목" value="<%=rs("file_title_jpn")%>">
+                    </td>
+                </tr>
+                     <tr>
+                    <th>이미지설명</th>
+                    <td>  
+                        <textarea id="file_desc" placeholder="이미지설명" name="file_desc"><%=rs("file_desc")%></textarea>
+                        <textarea id="file_desc_eng" placeholder="영문_이미지설명" name="file_desc_eng"><%=rs("file_desc_eng")%></textarea><br>
+                        <textarea id="file_desc_chn" placeholder="중문_이미지설명"  name="file_desc_chn"><%=rs("file_desc_chn")%></textarea>
+                        <textarea id="file_desc_jpn" placeholder="일문_이미지설명"  name="file_desc_jpn"><%=rs("file_desc_jpn")%></textarea>
+                    </td>
+                </tr>
+            </table>     
+            <a style="float: inline-end;" class="btn2 biggest" onclick="fnEditFile()">SAVE</a>
+            
+    </form>
+</div>
+<%
+rs.Close
+set rs=Nothing
+set myFiles=Nothing	
+%>
+	

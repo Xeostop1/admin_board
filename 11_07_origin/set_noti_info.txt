@@ -1,0 +1,61 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/inc/dev/top.inc-->
+<!--#include virtual=/classes/notification.asp-->
+<%
+Set myNoti =new Notification
+
+myNoti.noti_id = Request.Form("noti_id")
+If myNoti.noti_id="" Then
+	myNoti.noti_id=0
+End If
+
+myNoti.title = Request.Form("title")
+myNoti.noti_link=Request.Form("noti_link")
+
+myNoti.title_eng = Request.Form("title_eng")
+myNoti.title_chn = Request.Form("title_chn")
+myNoti.title_jpn = Request.Form("title_jpn")
+
+myNoti.sub_title = Request.Form("sub_title")
+myNoti.sub_title_eng = Request.Form("sub_title_eng")
+myNoti.sub_title_chn = Request.Form("sub_title_chn")
+myNoti.sub_title_jpn = Request.Form("sub_title_jpn")
+
+myNoti.mail_body = Request.Form("mail_body")
+myNoti.mail_body_eng = Request.Form("mail_body_eng")
+myNoti.mail_body_chn = Request.Form("mail_body_chn")
+myNoti.mail_body_jpn = Request.Form("mail_body_jpn")
+myNoti.lms_body = Request.Form("lms_body")
+myNoti.kakao_body = Request.Form("kakao_body")
+
+
+
+myNoti.mail_flag = Request.Form("mail_flag")
+myNoti.lms_flag = Request.Form("lms_flag")
+myNoti.fcm_flag = Request.Form("fcm_flag")
+myNoti.kakao_flag = Request.Form("kakao_flag")
+
+myNoti.due_date = Request.Form("due_date")
+
+myNoti.due = Request.Form("due")
+myNoti.sent_date = Request.Form("sent_date")
+myNoti.results = Request.Form("results")
+myNoti.exeOption = Request("exeOption")
+myNoti.dir_code = Request("dir_code")
+myNoti.file_name = Request("file_name")
+
+myNoti.saveNotiInfo()
+response.redirect "get_noti_form.html?noti_id="& myNoti.noti_id
+
+'리스폰스 리다이렉트 돌려보내기 마무리(del도 같이 할것) D로 받을 수 있으면 이렇게 처리하면 됩니다.
+'if exeOption="D" then
+' 			response.redirect "noti_list.html"
+' 		else	
+' 		 	response.redirect "get_noti_form.html?noti_id="& myNoti.noti_id
+' 		end if 
+	  
+
+
+
+
+%>

@@ -1,0 +1,69 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/inc/dev/top.inc-->
+<!--#include virtual=/classes/notification.asp-->
+<%
+  Response.CodePage = 65001
+  Response.CharSet = "utf-8"
+' nvarchar N넣기  
+noti_id = Request.Form("noti_id")
+pcs_id = Request.Form("pcs_id")
+pcs_maker = Request.Form("pcs_maker")
+idol_id = Request.Form("idol_id")
+unit_id = Request.Form("unit_id")
+
+Response.Write "<h1>여기set_Topic예요 </h1>"
+Response.Write noti_id
+Response.Write pcs_id
+Response.Write pcs_maker
+Response.Write idol_id
+Response.Write unit_id
+
+
+
+    ' sql="ANG_USP_NOTI_INFO_SAVE "
+    '   sql=sql&" "&noti_id&" ,"
+    '   sql=sql&" '"&dbstr(title)&"' ,"  
+    '   sql=sql&" '"&dbstr(title_eng)&"' ,"  
+    '   sql=sql&" N'"&dbstr(title_chn)&"' ,"  
+    '   sql=sql&" N'"&dbstr(title_jpn)&"' ,"  
+    '   sql=sql&" '"&dbstr(sub_title)&"' ,"  
+    '   sql=sql&" '"&dbstr(sub_title_eng)&"' ,"  
+    '   sql=sql&" N'"&dbstr(sub_title_chn)&"' ,"  
+    '   sql=sql&" N'"&dbstr(sub_title_jpn)&"' ,"  
+    '   sql=sql&" '"&dbstr(mail_body)&"' ,"  
+    '   sql=sql&" '"&dbstr(mail_body_eng)&"' ,"  
+    '   sql=sql&" N'"&dbstr(mail_body_chn)&"' ,"  
+    '   sql=sql&" N'"&dbstr(mail_body_jpn)&"' ,"  
+    '   sql=sql&" '"&dbstr(lms_body)&"' ,"  
+    '   sql=sql&" '"&dbstr(kakao_body)&"' ,"  
+    '   sql=sql&" '"&due_date&"' ,"  
+    '   sql=sql&" '"&due&"' ,"  
+    '   sql=sql&" '"&mail_flag&"' ,"  
+    '   sql=sql&" '"&lms_flag&"' ,"  
+    '   sql=sql&" '"&fcm_flag&"' ,"  
+    '   sql=sql&" '"&kakao_flag&"' ,"  
+    '   sql=sql&" '"&sent_date&"' ,"  
+    '   sql=sql&" '"&results&"' ,"  
+    '   sql=sql&" '"&exeOption&"' ,"  
+    '   sql=sql&" '"&admin_id&"' "  
+    '   response.write sql
+	'   set rs=getRs(sql)
+
+%>
+  <%
+    ' 	if exeOption="D" then
+	' 		response.redirect "noti_list.html"
+	' 	else	
+	' 	 	response.redirect "get_noti_form.html?noti_id="&rs("noti_id")
+	' 	end if 
+	  
+ 	'   rs.Close
+ 	'   set rs=nothing
+  
+  %>
+<script>
+//일단 닫는것 까지만
+ setTimeout(function() {
+            window.close();
+        }, 3000);  
+</script>

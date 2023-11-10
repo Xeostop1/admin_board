@@ -1,0 +1,571 @@
+<!--#include virtual=/inc/dev/vbutil.inc-->
+<!--#include virtual=/inc/dev/top.inc-->
+<!--#include virtual=/classes/notification.asp--> 
+<%	
+admin_id="mars1030"	
+dir_code="501"
+noti_id = Request("noti_id")
+admin_id = Request("admin_id")
+
+pvType=Request("pvType")
+pvLang=Request("pvLang")
+Response.Write ("<h2>"& pvType &"</h2>")
+%>
+<style>
+	.table_datagrid th{width:100px;height:inherit}
+	.table_datagrid td{text-align:left;}
+	textarea{height:100px;}
+	.sortable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+	.sortable li { margin: 3px 3px 3px 0; padding: 1px; float: left;  font-size: 4em; text-align: center; cursor:move}
+
+    /* 모달 */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+      }
+      
+      .modal-content {
+        background-color:#fefefe;
+        margin: 10% auto;
+        padding:20px;
+        border :3px solid #888;
+        border-radius :10px ;
+        width :50% ;
+        max-height: 70vh; 
+        overflow-y: auto    
+      }
+      .close{
+       cursor:pointer ;
+       float:right ;
+       font-size :28px ; 
+       font-weight:bold ; 
+      }
+
+</style>
+<script src="/jquery/noti.js"></script>
+<script>
+
+
+//=====토픽_검색=====
+	function fnSearchTopic(){    
+        $('select[name="topic_value"]').empty();   
+		noti_id="<%=noti_id%>"
+        var topic_key=$('select[name="topic_key"]').val();
+		var topic_value=$('select[name="topic_value"]').val();
+		var topic_search=$('input[name="topic_search"]').val();
+        var result=mFnSearchTopic(noti_id,topic_key,topic_search);
+        var target=$('select[name="topic_value"]'); 
+        var options = $.map(result, item => `<option value="${item.value}">${item.text}</option>`).join('');
+        target.append(options);
+	}
+
+//=====토픽_추가=====꼭! 확인하기!
+//토픽 topic 추가시 return JSON Map (예상수신자수 정보 포함ㅇ)
+	function fnAddTopic(){
+        noti_id="<%=noti_id%>"
+        var topic_key=$('select[name="topic_key"]').val();
+		var topic_value=$('select[name="topic_value"]').val();
+		var topic_search_val=$('input[name="topic_search"]').val();
+        if(topic_value !== '' && topic_search_val !== '') {
+            $('input[name="topic_search"]').focus()
+            //서버결과
+            var result=mFnAddTopic(noti_id,topic_key,topic_value);
+            console.log(result)
+            topic_value='';
+            $('ul#topic_list').empty();
+            if (Array.isArray(result)) {
+                var listItems = result.map(item => `<li><div style="width:60px;display:inline-block;font-weight:800">${item.type}</div>${item.topic}<a class="material-icons a_deleteTopic" topic_id="${item.id}">delete</a></li>`);
+                   $('ul#topic_list').append(listItems.join(''));
+            }
+        }else{
+            alert("주제 키워드를 넣어주세요😉")
+            $('input[name="topic_search"]').focus()
+        }
+    }
+    
+//=====토픽_개별삭제=====
+	$(document).on('click','.a_deleteTopic',function(){
+		if (confirm('주제를 삭제하시겠습니까?')){
+			var topic_id=$(this).attr('topic_id'); 
+			var result=mFnDeleteTopic(topic_id);
+            $('ul#topic_list').empty();
+            if(result && Array.isArray(result)){
+                var listItems = result.map(item => `<li><div style="width:60px;display:inline-block;font-weight:800">${item.type}</div> ${item.topic}<a class="material-icons a_deleteTopic" topic_id="${item.id}">delete</a></li>`);
+                 $('ul#topic_list').append(listItems.join(''));
+            } else {
+               // console.log('result is not an array:', result);
+            }
+		}		
+	})
+
+//=====이미지_랜더=====
+     function renderItems(items) {
+        $("#ul_topicfile").empty();
+        items.map(item => {
+            $("#ul_topicfile").append(`
+                <li>
+                    <div style="background-image:url('${item.file_name}'); width: 200px; height: 200px; background-size: cover; background-position: center;" class="thumbnail w100 file_item" file_id="${item.file_id}" img_src="${item.file_name}"></div>
+                    <a style=" margin-top:8px; display: block;" onclick="fnDeleteFile(event);"; class="material-icons file_del" file_id="${item.file_id}">delete</a>
+                </li>
+            `);
+        });
+    }
+    
+//=====파일_추가=====
+	 function fnAddFile(){
+        //name
+        var noti_id="<%=noti_id%>";
+        var file_name=$('#noti_filename').val();
+        if(!file_name){
+            alert("파일을 업로드 후 추가해주세요😅");
+            $('#noti_filename').focus();
+            return
+        }
+        var file_id='0';
+        var file_ids='';
+       var result=mFnSetFileInfo(noti_id,file_id,file_name,file_ids);
+       $("#ul_topicfile").empty();
+        renderItems(result)
+     }
+
+//=====이미지_삭제=====
+     function fnDeleteFile(event){
+        //id
+        var noti_id="0";
+        if(confirm("이미지를 삭제 하겠습니까?")){
+            var file_id = $(event.currentTarget).attr('file_id');
+            var file_name='';
+            var file_ids='';
+            var result=mFnSetFileInfo(noti_id,file_id,file_name,file_ids);
+            renderItems(result);                 
+        }
+     }
+    
+//같은 배열 순서일때 큐를 날리지 않게 세팅 필요
+//=====이미지_정렬=====
+    var preFile_ids=[];
+     function fnSortFile(){
+        //file_ids
+        var noti_id="<%=noti_id%>";
+        var file_ids=[];
+        var file_name='';
+        var file_id='0';
+        $(".thumbnail").each(function(){
+             var file_id = $(this).attr('file_id');
+             if(file_id && !file_ids.includes(file_id)){ 
+                    file_ids.push($(this).attr('file_id'));
+             }
+        });
+        if(preFile_ids!==null && JSON.stringify(file_ids) !== JSON.stringify(preFile_ids)) {
+             preFile_ids = file_ids.slice(); 
+            file_ids=file_ids.join(',');    
+            var result=mFnSetFileInfo(noti_id,file_id,file_name,file_ids);
+            alert('정렬_완료');
+            renderItems(result);
+        }else{
+            alert('같은순서입니다');
+        }
+     }
+
+    //========시간체크=========
+    function checkTime(){
+        var due_date = new Date($('#due_date').val());
+        var now = new Date();
+        var hours = [10,11,12,13,14,15,16,17,18];
+        hours.forEach(function(hour) {
+            var radioBtn = $('#due' + hour);
+            if(due_date.toDateString() == now.toDateString() && hour <= now.getHours()) {
+                radioBtn.prop('disabled', true);
+            }else{
+                radioBtn.prop('disabled', false);
+            }
+        });
+    }
+
+</script>
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-body">
+        </div>
+    </div>
+</div>
+<div class="div_title">
+	<h1>통합 알림 관리</h1>
+</div>
+
+    <%
+    ' noti_id 값
+    '*******입력값********
+    noti_id = Request("noti_id")
+    if noti_id="" then noti_id="0"
+      'Response.Write ("<h1>"& noti_id1 &"</h1>")
+      '*******sql*******
+      exeOption="V"
+
+'디폴트 세팅
+    due=12
+    mail_flag="1"
+    lms_flag="1"
+    fcm_flag="1"
+    kakao_flag="1"
+    due_date=date
+
+' SQL 넣기
+'noti_id 가 넘어온 경우 기존 정보를 select   /nvarchar N넣기      
+if cint(noti_id) >0 then
+	set myNoti=new Notification
+	myNoti.noti_id=noti_id
+    set rs=myNoti.selectNotiInfo
+	  	if not(rs.eof or rs.bof) then
+			title=rs("title")  	
+            noti_link=rs("noti_link")  	
+
+			title_eng=rs("title_eng")  	
+			title_chn=rs("title_chn")  	
+			title_jpn=rs("title_jpn")  	
+			sub_title=rs("sub_title")  	
+			sub_title_eng=rs("sub_title_eng")  	
+			sub_title_chn=rs("sub_title_chn")  	
+			sub_title_jpn=rs("sub_title_jpn")  	
+			mail_body=rs("mail_body")  	
+			mail_body_eng=rs("mail_body_eng")  	
+			mail_body_chn=rs("mail_body_chn")  	
+			mail_body_jpn=rs("mail_body_jpn")  	
+			lms_body=rs("lms_body")  	
+			kakao_body=rs("kakao_body")  	
+			due_date=rs("due_date")  	
+			due=rs("due")  	
+			mail_flag=rs("mail_flag")  	
+			lms_flag=rs("lms_flag")  	
+			fcm_flag=rs("fcm_flag")  	
+			kakao_flag=rs("kakao_flag")  	
+			sent_date=rs("sent_date")  	
+			
+			dir_code=rs("dir_code")
+			http=rs("http")
+			file_name=rs("file_name")
+            results=rs("results")
+
+		end if 	
+	  rs.Close
+	  set rs=Nothing
+	set myNoti=Nothing	  
+end if	   
+
+%>
+<script>
+ //=====서밋=====
+	function fnSubmit(exeOption){
+		$('#exeOption').val(exeOption);
+		var flag=false;
+		exeOption=='D'?flag=confirm('삭제 하시겠습니까?'):flag=fnPreSubmit($('#formNoti'));
+		if(flag){
+			$('#formNoti').submit();
+		}
+	}
+
+//=====다큐먼트 레디=====
+$(document).ready(function(){
+    $('input[name="topic_search"]').on('keydown', function(e) {
+   if (e.key === "Enter") fnSearchTopic();});
+   
+    $(".sortable").sortable();
+    checkTime();
+   $('#due_date').change(checkTime);
+
+   //=====전송주제&검색어비우기=====
+    $('select[name="topic_key"]').change(function() {
+       $('select[name="topic_value"]').val('');
+       $('input[name="topic_search"]').val('');
+       $('input[name="topic_search"').focus();
+   });
+
+   //=====파일_설명=====
+   $("body").on("click", ".file_item", function() {
+       var file_id= $(this).attr('file_id'); 
+       var noti_id="<%=noti_id%>";
+       $.ajax({
+           url: 'get_file_form.html',
+           type: 'GET',
+           data: { 
+               'file_id': file_id,
+                'noti_id': noti_id
+           }
+           })
+           .done(function(res){
+               $('.modal-body').html(res);
+               $("#myModal").show();
+           })
+           .fail(function(jqXHR, textStatus, errorThrown){
+               console.error('에러: ' + errorThrown);     
+           })
+           $(".close").click(function() {
+               $("#myModal").hide();
+           });
+       //     $(window).click(function(event) {
+       //         if ($(event.target).is("#myModal")) {
+       //             $("#myModal").hide();
+       //         }
+       // })
+   });
+
+//======삭제시_ 호버=========
+$(document).on('mouseenter', '.file_del', function(){
+       $(this).prev('.thumbnail').css('border', '4px solid rgba(222, 0, 0, 0.6)');
+   }).on('mouseleave', '.file_del', function(){
+       $(this).prev('.thumbnail').css('border', '');
+   });
+
+
+
+});
+
+
+
+  
+
+</script>
+<form id="formNoti"  method="POST" action="set_noti_info.html" >
+           noti_id <input type="text" value="<%=noti_id%>" name="noti_id" id="noti_id">
+            <input type="hidden" value="<%=dir_code%>" name="dir_code" id="dir_code">
+            <input type="text" name="exeOption" id="exeOption" readonly value="<%=exeOption%>">
+            <table class="table_datagrid">
+                <tr>
+                    <th>링 크</th>
+                    <td>
+                        <input type="text" value="<%=noti_link%>" name="noti_link" id="noti_link" placeholder="링크를 적어주세요" title="링크는 반드시 입력 해야 합니다.">                     
+                        <ul class="manual">
+	                        <li>연결주소는 http를 포함한 전체주소를 입력해야 합니다.</li>
+	                        <li>메일본문, 앱푸시알림 클릭시 연결됨</li>
+	                        <li>언어코드 포함되지 않은 주소 사용해야함 ex) https://www.gvg.co.kr/item/123123</li>
+	                        <li>발송언어에 따라 언어코드는 자동으로 PLUS</li>
+                        </ul>
+                    </td>    
+                </tr>
+                <tr>
+                    <th>제 목</th>
+                    <td>
+                      <input type="text" value="<%=title%>" name="title" id="title" class="mustinput" placeholder="한국어 제목" title="한국어 제목은 반드시 입력해야 합니다."> 
+                      <input type="text" id="title_eng" name="title_eng"  value="<%=title_eng%>" placeholder="영어 제목">
+                      <input type="text"  id="title_chn" name="title_chn" value="<%=title_chn%>" placeholder="중국어 제목">
+                      <input type="text"  id="title_jpn" name="title_jpn" value="<%=title_jpn%>" placeholder="일본어 제목">
+                      <ul class="manual">
+	                      <li>긴문자의 경우 한국어 제목만 사용</li>
+	                      <li>긴문자 제목은 한글기준 공백포함 최대 20자 까지만 보여짐.</li>
+                      </ul>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>소제목</th>
+                    <td>
+	                    <input type="text" name="sub_title" id="sub_title" value="<%=sub_title%>" placeholder="한국어 소제목">
+	                    <input type="text" id="sub_title_eng" name="sub_title_eng"  value="<%=sub_title_eng%>" placeholder="영어 소제목">
+	                    <input type="text" id="sub_title_chn" name="sub_title_chn"  value="<%=sub_title_chn%>" placeholder="중국어 소제목">
+	                    <input type="text" id="sub_title_jpn" name="sub_title_jpn"  value="<%=sub_title_jpn%>" placeholder="일본어 소제목">
+	                </td>
+                </tr>
+                <tr>
+                    <th>썸네일</th>
+                    <td>
+	                    <input id="file_name" dir_code="<%=dir_code%>" type="text" name="file_name" value="<%=file_name%>">
+						<a class="btn3 small a_upload" onclick="OpenUploader($(this).prev());">업로드</a>
+						<a <%if file_name <> "" then response.write " href="""&http&"/"&file_name&" "" target=""_blank"" " %> class="btn3 small a_preview" >보기</a>
+						<a class="btn3 small a_delimg">삭제</a>
+						<ul class="manual">
+							<li>메일본문 최상단에 사용됨</li>
+	                        <li>앱푸시발송에 사용됨.</li>
+	                        <li>가로 700px 이상</li>
+                        </ul>
+	                </td>
+                </tr>
+                <tr>
+                    <th>메일본문</th>
+                    <td><textarea name="mail_body" id="mail_body" cols="60" rows="10"><%=mail_body%></textarea>
+                </tr>
+                <tr>
+                    <th>메일_영어</th>
+                    <td><textarea name="mail_body_eng" id="mail_body_eng" cols="60" rows="10" ><%=mail_body_eng%></textarea></td>
+                </tr>
+                <tr>
+                    <th>메일_중국어</th>
+                    <td><textarea name="mail_body_chn" id="mail_body_chn" cols="60" rows="10"><%=mail_body_chn%></textarea></td>
+                </tr>
+                <tr>
+                    <th>메일_일본어</th>
+                    <td><textarea name="mail_body_jpn" id="mail_body_jpn" cols="60" rows="10"><%=mail_body_jpn%></textarea></td>
+                    
+                </tr>
+                <tr>
+                    <th>LMS</th>
+                    <td>
+                        <textarea name="lms_body" id="lms_body" cols="60" rows="10"><%=lms_body%></textarea>
+                        <ul class="manual">
+	                        <li>" [Web발신], [광고], 수신거부 " 는 자동첨부이므로 LMS내용에 넣지 마세요</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>카카오</th>
+                    <td><textarea name="kakao_body" id="kakao_body" cols="60" rows="10"><%=kakao_body%></textarea></td>
+                </tr>
+                <tr>
+                    <th>예약날짜</th>
+                    <td><input type="date" name="due_date" id="due_date" value="<%=due_date%>"></td>
+                </tr>
+                <tr >
+                    <th>발송시간</th>
+                    <td id="radioGroup">
+                    <%
+                    hours=Array(10,11,12,13,14,15,16,17,18)
+                    if noti_id <= 0 then
+                        due=11
+                    end if
+                        curHour=Hour(Now())
+                        For Each i In hours
+                            Response.Write("<input type='radio' name='due' id='due" & i & "' value='" & i & "'")
+                            If due = i Then Response.Write(" checked")
+                            If i < curHour Then Response.Write(" disabled")
+                                Response.Write(" style=""margin-left:20px;"">")
+                                Response.Write("<label for ='due" & i & "' style='display:inline-block;'>" & i & "시 </label>")
+                        Next
+                        %>                 
+                    </td>
+                </tr>
+                <tr>
+	                <th>발송수단</th>
+	                <td>
+		                <%
+		                  flags = Array("mail", "lms", "fcm", "kakao")
+		                  Response.Write("<table><tr>")
+		                  For Each flag In flags
+                          Response.Write("<th><label for='" & flag & "_flag'>" & flag & "</label></th>")
+                            Response.Write("<td style='width: 0px;padding-right:30px;'>")
+                            Response.Write("<label for='" & flag & "_flag'>")
+                            Response.Write("<input class='flag_checkbox' type='checkbox' name='" & flag & "_flag' id='" & flag & "_flag' value='1'") 
+                            If Eval(flag & "_flag") = 1 Then Response.Write(" checked")
+                            Response.Write("></td>")
+		                  Next
+						  Response.Write("</tr></table>")
+		                  %>
+		                
+	                </td>
+                </tr>
+                  <%
+	                  set myTopic=new Notification
+	                  myTopic.noti_id=noti_id
+                      If noti_id>0 Then
+                      set topicRs=myTopic.selectTopicInfo  
+                  %>
+                <tr>
+                  <th>전송 주제</th>
+                  <td>
+                    <select name="topic_key" title="주제를 선택하면 토픽을 고를 수 있습니다.">
+	                    <option value="pcs_id" selected>상품코드</option>
+                        <option value="pcs_maker">브랜드</option>
+                        <option value="idol_id">아이돌</option>
+                        <option value="unit_id">유  닛</option>
+                    </select>
+                    <select name="topic_value"></select>
+                    <input type="text" name="topic_search" placeholder="검색어 입력" title="검색어를 입력 또는 카테고리를 변경 후 검색을 눌러주세요">
+                    <a onclick="fnSearchTopic()" class="btn3 big material-icons">search</a>
+                    <a onclick="fnAddTopic()" id="a_addTopic" class="btn3 big material-icons">add</a>
+					<div class="pd30">
+						<ul id="topic_list">
+							<%
+							if not(topicRs.eof or topicRs.bof)	 then
+								do until topicRs.eof
+								%>
+								<li><div style="width:60px;display:inline-block;font-weight:800"><%=topicRs("topic_type")%></div> <%=topicRs("topic")%><a class="material-icons a_deleteTopic" topic_id="<%=topicRs("topic_id")%>">delete</a></li>
+								<%
+								topicRs.MoveNext
+								Loop	
+							end if	
+							%>
+						</ul>
+					</div>
+                  </td>
+                  <%
+	                 topicRs.Close
+	                 set topicRs=nothing                        
+                    End if
+	                 set myTopic=Nothing 
+                  %>
+                </tr>
+                    <%
+                        set myFile=new Notification
+                        myFile.noti_id=noti_id
+                        myFile.file_id=file_id
+                        If noti_id>0 Then
+                        set fileRs=myFile.selectfileInfo
+                    %>
+                    <tr>
+                        <th>첨부파일</th>
+                        <td>
+	                        
+                            <input id="noti_filename" dir_code="<%=dir_code%>" type="text" name="noti_filename">
+                            <a class="btn3 small a_upload" onclick="OpenUploader($(this).prev());">업로드</a>
+                            <a <%if file_name <> "" then response.write " href="""&http&"/"&file_name&" "" target=""_blank"" " %> class="btn3 small a_preview" >보기</a>
+                            <a class="btn3 small a_delimg">삭제</a>
+                            <a style="font-weight:bolder; margin-left:3px" onclick="fnAddFile()"class="btn2 small">추가</a>
+                            <a style="background-color: red; margin-left: 18px;" onclick="fnSortFile()"class="btn4 small">순서정렬</a>
+                            <ul class="manual">
+		                        <li>가로 700px 이상</li>
+		                        <li>순서 변경후 반드시 "순서정렬" 클릭해서 반영시켜야 함</li>
+	                        </ul>
+                        <div class="pd30">
+                            <ul class="sortable" id="ul_topicfile">
+                                        <%
+                                        if not(fileRs.eof or fileRs.bof) then	
+                                            do until fileRs.EOF
+                                                if fileRs("file_name") <> "" then
+                                                %>
+                                                <li>                                                    
+                                                    <div style="margin-left: 3px; background-image:url('<%=fileRs("http")%>/<%=fileRs("file_name")%>'); width: 200px; height: 200px; background-size: cover; background-position: center;" class="thumbnail w100 file_item" file_id="<%=fileRs("file_id")%>" img_src="<%=fileRs("http")%>/<%=fileRs("file_name")%>"></div>
+                                                    <a style="margin-top: 12px;" onclick="fnDeleteFile(event)"; class="material-icons file_del" file_id="<%=fileRs("file_id")%>">delete</a>
+                                                </li>
+                                                <%
+                                                end if
+                                            fileRs.MoveNext
+                                            Loop
+                                        end if
+                                        %>
+                            </ul>
+                        </div>
+                        
+                        <%
+                        fileRs.Close
+                        set fileRs=nothing
+                        set myFile=Nothing 
+                        %>
+                    </td>
+                </tr>
+                <tr>
+                    <th>실제 전송날짜</th>
+                    <td><input type="datetime" name="sent_date" id="sent_date" readonly value="<%=sent_date%>"></td>
+                </tr>
+                <tr>
+                <th>발송_결과</th>
+                <td>
+                    <%
+                        Response.Write convertChar(results)
+                    %> 
+                  </td>
+                </tr>
+                <%End if
+                %>
+            </table>     
+            <div class="pd30">
+				<a class="btn2 biggest" href="noti_list.html">목록보기</a>
+				<a class="btn2 biggest" onclick="fnSubmit('D');">삭제하기</a>
+                <% if noti_id > 0 then Response.Write("<a style='margin-left: 25px;' class='btn2 biggest' href='get_noti_preview.html?noti_id=" & noti_id & "' target='_blank'>미리보기</a>") %>
+                <a style="margin-left: 3px;" id="saveBtn" class="btn3 biggest" onclick="fnSubmit()" >저장하기</a>
+            </div>
+    </form>
