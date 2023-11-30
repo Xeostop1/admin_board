@@ -1,0 +1,259 @@
+class myShop {
+
+    constructor(data) { // 생성자 호출
+        var myshop_id;
+        var board_title;
+        var board_id;
+        var result;
+        this.myshop_id = data.myshop_id;
+        this.board_title = data.board_title;
+        this.board_id = data.board_id;
+        this.eventFlag = false;
+    }
+
+    createMyshop(pcs_id,imageUrl) {
+		this.pcs_id = pcs_id; 
+		this.imageUrl = imageUrl; 
+        var data = this.getBoardList();
+        this.createModal(data);
+    }
+
+    addMyshop() {
+        var input = $(`<input class="add_title" placeholder="title" style="height:50px">`);
+        var a = $(`<a class="material-symbols-outlined" style="padding-top: 13px;">add</a>`);
+        var div = $(`<div style="display:flex"></div>`).append(input, a);
+        return div;
+    }
+
+    addInput(type, placeholder, height, display = 'inline-block') {
+        return $(`<input class="${type}" placeholder="${placeholder}" style="height:${height}px; display:${display}">`);
+    }
+
+    addBtn(name, text, display = 'inline-block') {
+        return $(`<a class="material-symbols-outlined ${name}" style="padding-top: 13px; display:${display}">${text}</a><br>`);
+    }
+
+    addBoard() {
+		if(!this.eventFlag){
+            console.log("addBoard 실행중");
+		// 	var title = this.addInput('board_title', 'title', 50);
+		// 	var TBtn = this.addBtn('TBtn', 'add');
+        //     title=title.val();
+            
+        //     console.log(title);
+		// 	TBtn.off('click').on('click', () => {
+        //         this.onTBtn(title)
+        //       //  $('.board_add').hide(); 
+        //     });
+		// 	this.eventFlag = true;
+		}
+        // var board_div = $('<div>').addClass('board_add');
+        // board_div.append(title, TBtn);
+        // return board_div;
+    }
+
+    onTBtn(title) {
+        var newTitle = $(".board_title").val().trim();
+        if (newTitle !== "") {
+            var board_id = this.result.data.length + 1;
+			var newBoard = this.createBd(title, this.pcs_id);
+			var newBoardList = this.setBoardInfo(newBoard);
+			var newBoardDiv = this.showBoard(newBoardList);
+			var h2 = $('.mContent h2').detach();
+			$('.mContent').html('').append(h2).append(newBoardDiv);
+			$(".board_title").val('')
+			$(".board_des").val('')
+			
+        } else {
+            alert("타이틀을 적어주세요");
+           
+        }
+    }
+
+    //====
+    createBd(title, pcs_id, board_id = null) {
+        var board_title = typeof title === 'string' ? title.trim() : 'default title'; 
+        if (board_id !== null) {
+            var boardExis = this.result.data.some(board => board.board_id === board_id);
+            if (boardExis) {
+                this.result.pcs_id = pcs_id;
+                alert("기존 보드의 pcs_id가 업데이트되었습니다.");
+                //console.log(this.result);
+                };
+        } else {
+            // board_id가 없다면 새로운 보드를 추가
+            var newBoard = {
+                "board_id": this.result.data.length + 1,
+                "board_title": board_title,
+                "board_desc": 'description of new board',
+                "pcs_id": pcs_id
+            };
+            this.result.pcs_id = pcs_id;
+            this.result.data.push(newBoard);
+            alert("새 보드가 추가되었습니다.");
+            //console.log(this.result);
+        }
+        
+        // return {"resp":"OK/ERROR" , "resp_message":""}
+       	// OK then. confirm / end  
+        }
+
+		
+
+
+
+    // ===보드보기=====
+    showBoard(item) {
+		var self=this;
+        var board_div = $('.board_div');
+        if (board_div.length === 0) {
+            board_div = $('<div>').addClass('board_div');
+        }
+        var list_div = $('.board_list');
+        if (list_div.length === 0) {
+            list_div = $('<div>').addClass('board_list');
+            board_div.append(list_div);
+        }
+        list_div.empty();
+        var boards = Array.isArray(item) ? item : item.data;
+        console.log(boards)
+        $.each(boards, (i, board) => {
+            var b_Title = $(`<p>
+                            <a class="b_Title" style="display:inline-block"><b> ${i + 1}.</b> 
+							${board.board_title}</a>
+                            <br>
+                            </p>
+							`);
+                            b_Title.on('click', () => {
+                                var inputTitle = $('input.board_title').val(); 
+                                self.createBd(inputTitle, "45678", board.board_id); 
+                            });
+            list_div.append(b_Title);
+        });
+        
+        return board_div;
+    }
+
+	
+
+    createNewModal(content) {
+        var modal = $('<div>').addClass('modal').css({
+            'display': 'none',
+            'position': 'fixed',
+            'z-index': '1',
+            'left': '0',
+            'top': '0',
+            'width': '100%',
+            'height': '100%',
+            'overflow': 'auto',
+            'background-color': 'rgba(0,0,0,0.4)'
+        });
+		var mContent = $('<div>').addClass('mContent').css({
+			'background-color': '#fefefe',
+			'margin': '15% auto',
+			'padding': '20px',
+			'border': '1px solid #888',
+			'width': '80%',
+			'display': 'flex',
+			'justify-content': 'space-between' 
+		});
+        var closeBtn = $('<span>').addClass('close').text('X').css({
+            'color': '#aaa',
+            'float': 'right',
+            'font-size': '28px',
+            'font-weight': 'bold'
+        }).hover(function () {
+            $(this).css('color', 'black');
+        }, function () {
+            $(this).css('color', '#aaa');
+        });
+		var pcsthumb = $('<img>').attr('src', this.imageUrl).css({
+			'width': '150px',
+			'height': '150px'
+		});
+        mContent.append(closeBtn);
+        mContent.append(content,pcsthumb);
+        modal.append(mContent);
+        $('body').append(modal);
+        closeBtn.on('click', () => { modal.hide(); });
+        modal.show();
+        $(document).keyup(function (e) {
+            if (e.key === "Escape") {
+                modal.hide();
+            }
+        });
+        return { modal: modal, mContent: mContent, closeBtn: closeBtn };
+    }
+
+    // ====모달생성====
+    createModal(item) {
+        $('.modal').remove();
+        var mContent = $('<div>').addClass('mContent');
+        // myShop 없으면 생성
+
+        if (item.myshop_id <= 0) {
+            var itemDiv = this.addMyshop();
+
+            mContent.append(itemDiv);
+        } else {
+            mContent.append(`<h2> ${item.myshop_title} <span class="material-symbols-outlined">store</span></h2>`);
+            var board_div = this.showBoard(this.result);
+            var newBoard = this.addBoard();
+            newBoard.find('.DBtn').off('click').on('click', () => this.onDBtn(newBoard.find('.board_title'), newBoard.find('.board_des'), newBoard.find('.DBtn')));
+            board_div.append(newBoard);
+            mContent.append(board_div);
+        }
+        var modalItem = this.createNewModal(mContent);
+      
+        return modalItem;
+    }
+
+    // 컬렉션 정보저장
+    setBoardInfo(newBoard) {
+        this.result.data.push(newBoard);
+        // return this.getBoardList();
+        // return this.result.data;
+        return this.result.data;
+    }
+
+    // 내 컬렉션 리스트 조회  
+    getBoardList() {
+        this.result = {
+            "pcs_id": 123,
+            "pcs_name": "goods name",
+            "pcs_image": 'https://d23.com/app/uploads/2013/04/1180w-600h_mickey-mouse_1.jpg',
+            "myshop_id": this.myshop_id,
+            "myshop_title": "myshop title",
+            "data": [
+                {
+                    "board_id": 1,
+                    "board_title": "test board 1",
+                    "board_desc": "description of test board 1"
+                },
+                {
+                    "board_id": 2,
+                    "board_title": "test board 2",
+                    "board_desc": "description of test board 2"
+                }
+            ]
+        };
+        return this.result;
+    }
+}
+
+const ms = new myShop({
+    myshop_id: 3,
+    board_title: 'TeTenoWinter'
+});
+
+
+$(document).on('click', '.a_toggleMyshop', function () {
+	var hrefValue  = $(this).parent().prev('a').attr('href');
+	var pcs_id = hrefValue.match(/\d+/)[0];
+	var backgroundImag = $(this).closest('.div_pcsthumb').attr('style');  
+    var imageUrlMatch = backgroundImag.match(/url\("(.+?)"\)/);  
+    var imageUrl = imageUrlMatch ? imageUrlMatch[1] : ''; 
+	
+    ms.createMyshop(pcs_id,imageUrl);
+});
+

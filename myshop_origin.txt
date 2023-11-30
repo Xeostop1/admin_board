@@ -1,0 +1,82 @@
+
+	class myShop{
+
+		constructor(data){ // 생성자 호출
+			var myshop_id;
+			var board_title;
+			var board_id;
+			var result;
+			this.myshop_id=data.myshop_id;
+			this.board_title=data.board_title;
+			this.board_id=data.board_id;
+	    }
+        
+	    
+        setBoardInfo(board_id, board_title, board_desc) {
+            this.data.push({
+                "board_id": board_id,
+                "board_title": board_title,
+                "board_desc": board_desc
+            });
+        }
+        updateBoardInfo(board_id, new_title, new_desc) {
+            for (let i = 0; i < this.data.length; i++) {
+                if (this.data[i].board_id === board_id) {
+                    this.data[i].board_title = new_title;
+                    this.data[i].board_desc = new_desc;
+                    return;
+                }
+            }
+            console.log('해당하는 board_id를 찾을 수 없습니다.');
+        }
+        deleteBoardInfo(board_id) {
+            for (let i = 0; i < this.data.length; i++) {
+                if (this.data[i].board_id === board_id) {
+                    this.data.splice(i, 1);
+                    return;
+                }
+            }
+            console.log('해당하는 board_id를 찾을 수 없습니다.');
+        }
+        
+	    // //컬렉션 정보저장
+	  	// setBoardInfo(newBoard){
+        //     var update=this.result.data.push(newBoard);
+		//   	//return this.getBoardList();
+        //     return this.result.data; 
+	  	// }
+	  	//내 컬렉션 리스트 조회  
+	    getBoardList(){
+				this.result={
+				"myshop_id":this.myshop_id,
+				"myshop_title":"myshop title",
+				"data":[
+                    {
+						"board_id":1,
+						"board_title":"test board 1",
+						"board_desc":"description of test board 1"
+					},
+					{
+						"board_id":2,
+						"board_title":"test board 2",
+						"board_desc":"description of test board 2"
+					}
+				]
+			};
+	        return this.result;
+	    }
+	}
+	
+	const ms=new myShop({
+		myshop_id:3,
+		board_title:'TeTenoWinter'
+	});
+	
+	//alert(JSON.stringify(ms.setBoardInfo()));
+	$(document).on('click','.a_toggleMyshop',function(){
+        // var hori=$(this).offset();
+        // var verti=$(this).outerHeight();
+        ms.createMyshop()
+    
+    })
+    

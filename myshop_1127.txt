@@ -1,0 +1,206 @@
+
+	class myShop{
+
+		constructor(data){ // 생성자 호출
+			var myshop_id;
+			var board_title;
+			var board_id;
+			var result;
+			this.myshop_id=data.myshop_id;
+			this.board_title=data.board_title;
+			this.board_id=data.board_id;
+	    }
+        
+	    
+        createMyshop(){
+            var data=this.getBoardList()
+            this.createModal(data);
+        }
+
+        addMyshop(){
+            var input = $(`<input class="add_title" placeholder="title" style="height:50px">`);
+            var a = $(`<a class="material-symbols-outlined" style="padding-top: 13px;">add</a>`);
+            var div = $(`<div style="display:flex"></div>`).append(input, a);
+            return div;
+        }
+        
+        addInput(type, placeholder, height, display = 'inline-block') {
+            return $(`<input class="${type}" placeholder="${placeholder}" style="height:${height}px; display:${display}">`);
+        }
+        addBtn(text, display = 'inline-block') {
+            return $(`<a class="material-symbols-outlined" style="padding-top: 13px; display:${display}">${text}</a><br>`);
+        }
+        clearInput(input) {
+            input.val('');
+        }
+
+        addBoard() {
+            //설명은 나중에 추가 주석처리 
+            //var item = this.getBoardList();
+            var title = this.addInput('board_title', 'title', 50);
+            var TBtn= this.addBtn('add');
+            var desc = this.addInput('board_des', 'description', 50, 'none');
+            var DBtn=this.addBtn('add', 'none');
+            var that = this;
+            TBtn.on('click', function() {
+                if (title.val().trim()!== "") {
+                    desc.show();
+                    DBtn.show();
+                } else {
+                    alert("타이틀을 적어주세요");
+                }
+            });
+            //추가파트 
+            var board_div = $('<div>').addClass('board_add');
+            DBtn.on('click', function() {
+                var board_title  = title.val();
+                var board_desc = desc.val();
+                var board_id = that.result.data.length + 1;
+                var newBoard = {
+                    board_id:board_id,
+                    board_title: board_title,
+                    board_desc: board_desc
+                };
+                var updateList=that.setBoardInfo(newBoard)
+                console.log(updateList);
+                
+                var newBoardDiv = that.showBoard(updateList);
+                var h2=$('.mContent h2').detach();
+                // $('.mContent').html(newBoardDiv); 
+                $('.mContent').html('');                
+                $('.mContent').append(h2).append(newBoardDiv); 
+                that.clearInput(title);
+                that.clearInput(desc);
+                desc.hide();
+                DBtn.hide();
+            });
+            board_div.append(title, TBtn, desc, DBtn);
+            return board_div
+            
+        }
+
+            //===보드보기=====
+            showBoard(item){                
+                var board_div = $('.board_div');
+                if (board_div.length === 0) {
+                    board_div = $('<div>').addClass('board_div');
+                }
+                var list_div = $('.board_list');
+                if (list_div.length === 0) {
+                    list_div = $('<div>').addClass('board_list');
+                    board_div.append(list_div);
+                }
+                $.each(item.data, (i, board) => {
+                            var b_Title = $(`<p>
+                                       <b> ${i + 1}.</b> ${board.board_title}
+                                        <br>
+                                        </p>`);
+                            list_div.append(b_Title);
+                });
+                return board_div;
+            }
+
+        //====모달생성====
+        createModal(item){
+            var board_div=this.showBoard(this.result);  
+            var modal=$('<div>').addClass('modal');
+            var mContent=$('<div>').addClass('mContent');
+            var closeBtn=$('<span>').addClass('close').text('X');
+            mContent.append(closeBtn);
+            var itemDiv
+            //myShop 없으면 생성
+            if(item.myshop_id<=0){
+                itemDiv = this.addMyshop();
+                mContent.append(itemDiv)
+            }else{
+                mContent.append(`<h2> ${item.myshop_title} <span class="material-symbols-outlined">store</span></h2>`)
+                //var board_div =  $(`<div class="board_div" style="width=300px"></div>`);
+                console.log("createModal_showBoard");
+                var board_div = this.showBoard(this.result); 
+                console.log("createModal append");
+                mContent.append(board_div);
+                modal.append(mContent);
+                board_div.append(this.addBoard());
+            }
+            modal.append(mContent);
+            $('body').append(modal);           
+            closeBtn.on('click',()=>{ modal.hide();})
+            var item={ modal: modal, mContent: mContent, closeBtn: closeBtn };
+            this.modalCss(item);
+            modal.show();
+            return item;
+        }
+        
+        //====모달CSS====
+        modalCss(item){
+            item.modal.css({
+                'display': 'none',
+                'position': 'fixed',
+                'z-index': '1',
+                'left': '0',
+                'top': '0',
+                'width': '100%',
+                'height': '100%',
+                'overflow': 'auto',
+                'background-color': 'rgba(0,0,0,0.4)'
+            });
+            item.mContent.css({
+                'background-color': '#fefefe',
+                'margin': '15% auto',
+                'padding': '20px',
+                'border': '1px solid #888',
+                'width': '80%'
+            });
+            item.closeBtn.css({
+                'color': '#aaa',
+                'float': 'right',
+                'font-size': '28px',
+                'font-weight': 'bold'
+            }).hover(function() {
+                $(this).css('color', 'black');
+            }, function() {
+                $(this).css('color', '#aaa');
+            });
+        
+        }
+	    //컬렉션 정보저장
+	  	setBoardInfo(newBoard){
+            var update=this.result.data.push(newBoard);
+		  	//return this.getBoardList();
+            return this.result.data; 
+	  	}
+	  	//내 컬렉션 리스트 조회  
+	    getBoardList(){
+				this.result={
+				"myshop_id":this.myshop_id,
+				"myshop_title":"myshop title",
+				"data":[
+                    {
+						"board_id":1,
+						"board_title":"test board 1",
+						"board_desc":"description of test board 1"
+					},
+					{
+						"board_id":2,
+						"board_title":"test board 2",
+						"board_desc":"description of test board 2"
+					}
+				]
+			};
+	        return this.result;
+	    }
+	}
+	
+	const ms=new myShop({
+		myshop_id:3,
+		board_title:'TeTenoWinter'
+	});
+	
+	//alert(JSON.stringify(ms.setBoardInfo()));
+	$(document).on('click','.a_toggleMyshop',function(){
+        // var hori=$(this).offset();
+        // var verti=$(this).outerHeight();
+        ms.createMyshop()
+    
+    })
+    
