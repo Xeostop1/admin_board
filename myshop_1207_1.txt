@@ -1,0 +1,40 @@
+ this.getBoardList().done((result) => {
+            alert(JSON.stringify(result))
+            // console.log(JSON.stringify(result));
+            //result 이용해서 화면생성
+            var content = '<div>';
+            content=content+`<p>myshop_id: ${result.myshop_id}</p>`;
+            content=content+`<b><p>myshop_title: ${result.myshop_title}</p></b>`;
+            content=content+'<br>';
+            //상품썸네일 추가
+            content=content+'<div style="position:relative;width:100px;height:100px;border:1px solid #222222;">';
+            // content=content+`<div style="border: 1px solid red; width: 50px; height: 50px;"><span>+ ${pcs.length}</span></div>`;    
+            	//THumbnail nth-child
+                // for (let i = 0; i < 3; i++) {
+                //     const element = pcs[i].pcs_id;
+                //     content=content+`<div style="background-image: url('${pcs[i].pcs_image}');width: 100px; height: 100px; background-size: cover"></div>`;
+                // }
+            	content=content+'</div>';	
+            content=content+'</div>';
+            ////////////////////////////
+            
+            content=content+'<ul>';
+    
+             // result.data가 존재하고 그 길이가 0보다 큰 경우만 forEach 실행
+        if (result.data && result.data.length > 0) {
+            result.data.forEach(board => {
+			content=content+'<li>';
+			content=content+'<a board_id="'+board.board_id+'" class="board-title" onclick="setBoardInfo('+board.board_id+','+this.pcs_ids+', \'ADD\');">'+board.board_title+'</a>';
+			content=content+'</li>';
+            });
+        }else{
+	    	content=content+'<li>NO BOARD</li>';    
+        }
+        content=content+'</ul>';    
+        content=content+' <input type="text" id="board_title"><a id="a_addToNew" class="btn1 biggest">새로운 보드에 추가</a>';
+        this.modalContent=content;
+       	this.OpenModal();
+
+        }).fail((jqXHR, textStatus, errorThrown) => {
+            console.log(textStatus, errorThrown);
+        });

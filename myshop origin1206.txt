@@ -1,0 +1,365 @@
+class myShop {
+
+    constructor(data) { // 생성자 호출
+        var myshop_id;
+        var board_title;
+        var board_id;
+        var result;
+        this.myshop_id = data.myshop_id;
+        this.board_title = data.board_title;
+        this.board_id = data.board_id;
+        this.eventFlag = false;
+    }
+
+    initializeShop = () => {
+        $.ajax({
+            type: "GET",
+            url: "myshop/ajax/set_myshop_up.asp",
+            dataType: "json"
+        }).done((response) => {
+            console.log(response);
+            this.myshop_id = response.myshop_id; // 22
+            this.myshop_title = response.myshop_title; // "서하나님의 스토어"
+            this.board_id = null;
+            this.result = response.data; // []
+            this.showShopInfo()
+            this.eventFlag = false;
+        }).fail((jqXHR, textStatus, errorThrown) => {
+            console.log(textStatus, errorThrown);
+        });
+    }
+
+    showShopInfo = () => {
+        console.log("myshop_id " + this.myshop_id);
+        console.log("myshop_title Title: " + this.myshop_title);
+        console.log("Result: " + JSON.stringify(this.result));
+    }
+
+
+    
+    //set으로 변경 
+  // 컬렉션 정보저장
+//   sendNewData(newBoard) {
+//     console.log(newBoard);
+//     this.result.pcs_id = newBoard.pcs_id; 
+//     this.result.data.push(newBoard.data);
+//     // return this.getBoardList();
+//     // return this.result.data;
+//     return this.result.data;
+// }
+
+
+ // 내 컬렉션 리스트 조회  
+ getBoardList(pcs_ids) {
+    return $.ajax({ 
+        type: "GET",
+        url: "myshop/ajax/get_board_list.asp",
+        data: {pcs_ids: pcs_ids},  // pcs_id를 pcs_ids 배열로 서버에 전달
+        dataType: "json"
+    }).done((response) => { 
+        console.log(response);
+        if (response.myshop_id === 0) {
+            this.initializeShop(); 
+        } else {
+            this.result = response; 
+            console.log(response);
+        }
+    }).fail((jqXHR, textStatus, errorThrown) => { 
+        console.log(textStatus, errorThrown);
+    });
+}
+
+
+//상품추가, 상태변경, 삭제 
+//set으로 데이터 보내서 서버에 저장하기 (보드id, 상품번호, 상태)
+//Z상태: 상태코드 ( ADD : 상품추가, REMOVE : 상품삭제, ON/OFF: 공개/비공개설정)
+//newBoard 넣으면 안꼬일까 모르겠네, 꼬이면 다시 빼기
+//지금 넘겨주는 값이 data만 있어서 괜찮을까 모르겠네.//스프레드 오퍼레이터
+// console.log(newBoard);
+// this.result.pcs_id = newBoard.pcs_id; 
+// this.result.data.push(newBoard.data);
+
+//들어가는 확인, 계속 같은 걸로 만들어 지는거 에러 잡기 
+//보드_id 체크하고 넣고 
+setBoardInfo(board_id, pcs_ids, status, newBoard) {
+    if (!this.result) this.result = {}; 
+    if (!this.result.data) this.result.data = [];
+    if (!Array.isArray(pcs_ids)) pcs_ids = [pcs_ids];
+    pcs_ids = pcs_ids.map(id => Number(id)); 
+
+    var existingBoardData = this.result.data.find(data => data.board_id === Number(board_id));
+    // 새로운 보드 생성 
+    if (!existingBoardData && board_id === 0) { 
+        var newBoardData = {
+            board_id: board_id,
+            board_title: newBoard.data.board_title
+        };
+        this.result.data.push(newBoardData);
+    }
+
+    pcs_ids.forEach(pcs_id => {
+        var pcsObject = this.result.pcs.find(pcs => pcs.pcs_id === pcs_id) || null;
+        if (!pcsObject) {
+            pcsObject = {
+                pcs_id: pcs_id,
+                pcs_image: newBoard.data.pcs_image,
+                pcs_name: newBoard.data.pcs_name
+            };
+            this.result.pcs.push(pcsObject);
+        }
+    });
+
+    console.log(JSON.stringify(this.result, null, 2));
+
+    $.ajax({
+        type: "GET",
+        url: "/myshop/ajax/set_myshop_pcs.asp",
+        data: {
+            board_id: board_id === 0 ? board_id : Number(board_id),
+            // pcs_ids: pcs_ids,
+            pcs_ids: pcs_ids.join(','),
+            status: status,
+            board_title: newBoard.data.board_title
+        }
+    }).done(function(response) {
+        //console.log(response);
+        let parsedResponse = JSON.parse(response);
+        console.log(parsedResponse);
+        if(parsedResponse.resp === 'OK') {
+            alert(parsedResponse.resp_message);
+            console.log('적용된 상품 수: ' + parsedResponse.pcs_count);
+            console.log('상태: ' + parsedResponse.status);
+        } else if(parsedResponse.resp === 'ERROR') {
+            console.error(parsedResponse.resp_message);
+        } else {
+            console.log('알 수 없는 resp 값입니다: ' + parsedResponse.resp);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+    });
+    
+    return this.result;
+}
+
+    //상품번호 파라미터로 받아서 사용자에게 타이틀 값 받아서 뉴보드 데이터 넣기 / 리턴없음/ 리턴 수정 
+    addItem(pcs_id) {
+        if (!this.eventFlag) {
+            var input = $('<input id="titleInput" type="text" placeholder="새로운 board_title을 입력해주세요">');
+            var btn = $('<button>확인</button>');
+            btn.click(() => {
+                var title = input.val();
+                //뉴 보드값 잘 전해 주기
+                if (title) {
+                    var newBoard = {
+                        "pcs_id": pcs_id,
+                        "data":{
+                            "board_id": this.result.data.length ,
+                            // "board_id": this.result.data.length ,
+                            "board_title": `${title}`
+                            // "board_title": `${title} (pcs_id: ${pcs_id})`,
+                            //"board_desc": "description of " + title
+                        }
+                    };
+                    input.remove();
+                    btn.remove();
+                    this.addBoard(newBoard);
+                    this.eventFlag = true;
+                    //ajax
+                    this.setBoardInfo(newBoard.data.board_id, pcs_id, 'ADD', newBoard);
+                } else {
+                    alert('값을 입력해주세요.');
+                }
+            });
+            this.content.append(input, btn);
+        }
+    }
+
+ 
+
+
+
+   
+    //뉴보드 파라미터로 받아서 저장하고 보드 전체로 새로운 보드 보여주기 
+    addBoard(newBoard) {
+        this.result.data.push(newBoard.data);   
+        this.showSingleBoard(newBoard, this.imageUrl); 
+    }
+
+    //새로운 보드 보여주기(뉴보드, 이미지 파라미터 받기)
+    showSingleBoard(newBoard, imageUrl){
+        this.imageUrl = imageUrl;
+        var content = $('<div>').css('display', 'flex').css('flex-direction', 'column').css('align-items', 'flex-start');
+        //content.append(`<p>myshop_id: ${newBoard.pcs_id}</p>`);
+        content.append(`<p>myshop_id: ${newBoard.pcs_id}</p>`); 
+        //content.append(`<b><p>myshop_title: ${newBoard.data.board_title}</p></b>`);
+        content.append('<br>');
+        content.append(`<li style="cursor: pointer;" >board_id: ${newBoard.data.board_id}, <br>board_title: ${newBoard.data.board_title}</li>`);
+        this.modalObject.mContent.append(content); 
+    }
+
+
+    //기존보드 보여주기(pcs_id, 이미지 받기)
+    showBoard(pcs_id, imageUrl) {
+        this.imageUrl = imageUrl;
+        this.getBoardList(pcs_id).done((result) => {
+            var content = $('<div>').css('display', 'flex').css('flex-direction', 'column').css('align-items', 'flex-start');
+            content.append(`<p>myshop_id: ${result.myshop_id}</p>`);
+            content.append(`<b><p>myshop_title: ${result.myshop_title}</p></b>`);
+            content.append('<br>');
+            var ul = $('<ul>');
+    
+             // result.data가 존재하고 그 길이가 0보다 큰 경우만 forEach 실행
+        if (result.data && result.data.length > 0) {
+            result.data.forEach(board => {
+                var li = $(`
+                    <li><input type="text" name="board_id" value="${board.board_id}"><span style="cursor: pointer;" class="board-title">board_title: ${board.board_title}</span></li>`);
+                ul.append(li);
+            });
+        }
+
+        content.append(ul);
+        this.content = content;
+
+        // if (!result.data || result.data.length === 0) {
+        //     this.addItem(pcs_id);
+        //     }
+            this.addItem(pcs_id);
+            var modalObject = this.createNewModal(content);
+            this.modalObject = modalObject;
+
+            $('.board-title').on('click', (e) => {
+                //var title = $(e.target).text();
+                //var board = this.result.data.find(data => data.board_title === title);
+
+                this.updatePcs(pcs_id, e.target);
+            });
+        }).fail((jqXHR, textStatus, errorThrown) => {
+            console.log(textStatus, errorThrown);
+        });
+    }
+
+    
+    // btClick(pcs_id, title, element) {
+    //     if (!this.eventFlag) {
+    //         var board_title = title.replace('board_title: ', '');
+    //         var new_title = `${board_title} (pcs_id: ${pcs_id})`;
+    //         $(element).text(new_title);
+    //         this.eventFlag = true;
+    //     }
+    // }
+
+    //기존보드 추가 사용자가 타이틀을 클릭 시 pcs_id를 추가하여 업데이트
+       updatePcs(pcs_id, target){
+        var board_id = $(target).parent().find('input[name="board_id"]').val();
+        var board = this.result.data.find(data => data.board_id === board_id);
+          if(board){
+            if(!this.result.pcs) this.result.pcs = [];
+            // board_id가 존재하면 pcs 배열에 pcs_id를 추가
+            this.result.pcs.push({pcs_id: pcs_id});
+            console.log("업데이트 데이터: ", JSON.stringify(this.result, null, 2));
+            //this.setBoardInfo(board_id, pcs_id, "ADD", newBoard);
+        } else {
+            console.log('해당하는 board_id가 없습니다.');
+        }
+
+    }
+
+
+    //컨텐트(내용), 클릭한ele 받아서 새로운 모달 보여주기 css 파일로 변경
+    createNewModal(content) {
+        var modal = $('<div>').addClass('modal').css({
+            'display': 'none',
+            'position': 'fixed',
+            'z-index': '1',
+            'left': '0',
+            'top': '0',
+            'width': '100%',
+            'height': '100%',
+            'overflow': 'auto',
+            'background-color': 'rgba(0,0,0,0.4)'
+        });
+		var mContent = $('<div>').addClass('mContent').css({
+			'background-color': '#fefefe',
+			'margin': '15% auto',
+			'padding': '20px',
+			'border': '1px solid #888',
+			'width': '80%',
+			'display': 'flex',
+			'justify-content': 'space-between' 
+		});
+        var closeBtn = $('<span>').addClass('close').text('X').css({
+            'color': '#aaa',
+            'float': 'right',
+            'font-size': '28px',
+            'font-weight': 'bold'
+        }).hover(function () {
+            $(this).css('color', 'black');
+        }, function () {
+            $(this).css('color', '#aaa');
+        });
+        console.log(this.imageUrl);
+		var pcsthumb = $('<img>').attr('src', this.imageUrl).css({
+			'width': '150px',
+			'height': '150px'
+		});
+        mContent.append(closeBtn);
+        mContent.append(content,pcsthumb);
+        modal.append(mContent);
+        $('body').append(modal);
+        closeBtn.on('click', () => { 
+            modal.hide(); 
+            this.eventFlag = false;
+        });
+        modal.show();
+        $(document).keyup(function (e) {
+            if (e.key === "Escape") {
+                modal.hide();
+            }
+        });
+        return { modal: modal, mContent: mContent, closeBtn: closeBtn };
+    }
+
+
+  
+
+   
+//근데 이걸 db에 다 저장할껀가?? 
+//웹에서 가져와야 할것 상품이름, 번호, 이미지url은 무조건 추출 
+        // this.result = {
+        //     "pcs_id": 123,
+        //     "pcs_name": "goods name",
+        //     "pcs_image": 'https://d23.com/app/uploads/2013/04/1180w-600h_mickey-mouse_1.jpg',
+        //     "myshop_id": this.myshop_id,
+        //     "myshop_title": "myshop title",
+        //     "data": [
+        //         {
+        //             "board_id": 1,
+        //             "board_title": "test board 1",
+        //             "board_desc": "description of test board 1"
+        //         },
+        //         {
+        //             "board_id": 2,
+        //             "board_title": "test board 2",
+        //             "board_desc": "description of test board 2"
+        //         }
+        //     ]
+        // };
+        // return this.result;
+    }
+
+
+const ms = new myShop({
+    myshop_id: 3,
+    board_title: 'TeTenoWinter'
+});
+
+
+$(document).on('click', '.a_toggleMyshop', function () {
+	var hrefValue  = $(this).parent().prev('a').attr('href');
+	var pcs_id = hrefValue.match(/\d+/)[0];
+	var backgroundImag = $(this).closest('.div_pcsthumb').attr('style');  
+    var imageUrlMatch = backgroundImag.match(/url\("(.+?)"\)/);  
+    var imageUrl = imageUrlMatch ? imageUrlMatch[1] : ''; 
+	
+    ms.showBoard(pcs_id,imageUrl);
+});

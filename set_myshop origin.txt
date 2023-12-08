@@ -1,0 +1,80 @@
+setBoardInfo(board_id, pcs_id, status, newBoard) {
+    //비동기 때문에 빈배열 설정 후 넣기 
+    if (!this.result.data) this.result.data = []; 
+    
+    var pcsObject = this.result.pcs.find(pcs => pcs.pcs_id === Number(pcs_id)) || null;
+    
+    //동일 id 보드 확인
+    //중복확인하고 다시 코드 만들기
+    var existingBoardData = this.result.data.find(data => data.board_id === Number(board_id));
+    console.log(existingBoardData);
+
+    if (!existingBoardData) {
+        var newBoardData = {
+            board_id: Number(board_id),
+            board_title: newBoard.data.board_title
+        };
+        this.result.data.push(newBoardData);
+    }
+
+    if (!pcsObject) {
+        pcsObject = {
+            pcs_id: Number(pcs_id),
+            pcs_image: newBoard.data.pcs_image,
+            pcs_name: newBoard.data.pcs_name
+        };
+        this.result.pcs.push(pcsObject);
+    }
+
+    console.log(JSON.stringify(this.result, null, 2));
+
+    // //새로운 보드 
+    // var newBoardData = {
+    //     board_id: board_id,
+    //     board_title: newBoard.data.board_title
+    // };
+    // if (!existingBoardData) {
+    //     this.result.data.push(newBoardData);
+    // }
+    // var updatedData = {
+    //     ...this.result,
+    //     pcs_id: pcs_id,
+    //     pcs: [pcsObject],
+    //     data: [...this.result.data, newBoardData]   
+    // };
+    // console.log(JSON.stringify(updatedData, null, 2)); 
+    // this.result = updatedData;
+
+    // AJAX 요청 코드 추가
+    $.ajax({
+        type: "GET",
+        url: "myshop/ajax/set_myshop_pcs.asp",
+        data: {
+            board_id: board_id,
+            pcs_id: pcs_id,
+            status: status,
+            board_title: newBoard.data.board_title
+        }
+    }).done(function(response) {
+        console.log(response);
+        switch(response.status) {
+            case 'ADD':
+                alert('상품이 추가되었습니다.');
+                break;
+            case 'REMOVE':
+                alert('상품이 삭제되었습니다.');
+                break;
+            case 'ON':
+                alert('상품이 공개되었습니다.');
+                break;
+            case 'OFF':
+                alert('상품이 비공개로 설정되었습니다.');
+                break;
+            default:
+                console.log('알 수 없는 status 값입니다: ' + response.status);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+    });
+    return this.result.data;
+}
