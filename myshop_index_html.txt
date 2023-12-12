@@ -1,0 +1,113 @@
+<!--#include virtual=/inc/vbutil.inc-->
+<!--#include virtual=/inc/aspJson.inc-->
+<!--#include virtual=/inc/Classes/myshop.asp-->
+<!--#include virtual=/inc/Classes/sqlJson.asp-->
+<!--#include virtual=/myshop/inc/top.inc-->
+			<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+	$(document).on('click','.jiggle',function(){
+		$(this).toggleClass('selected');
+	});
+	function fnToggleMenu(){
+		var myPcs_ids=[];
+		var pcs_ids=[];
+		$('.mspPcsList>li.selected').each(function(){
+			myPcs_ids.push($(this).attr('myPcs_id'));
+			pcs_ids.push($(this).attr('pcs_id'));
+		});
+	}
+	function fnShowAdmin(flag){
+		$('.mspPcsList>li').removeClass('selected');
+		if(flag){
+			$(".mspPcsList").sortable();
+			$('#mspAdminContainer').show();	
+			$('.mspPcsList>li').addClass('jiggle');
+			$(".mspPcsList").sortable('enable');
+			$(".mspPcsList>li a").attr('data-link',$(".mspPcsList>li a").attr('href'));
+			$(".mspPcsList>li a").attr('href','javascript:void(0);');
+			//$(".mspPcsList").selectable();
+		}else{
+			$('#a_toggleSelect').show();
+			$('#mspAdminContainer').hide();	
+			$('.mspPcsList>li').removeClass('jiggle');
+			$(".mspPcsList").sortable('disable');
+			$(".mspPcsList>li a").attr('href',$(".mspPcsList>li a").attr('data-link'));			
+			
+		}
+	}
+</script>
+<%
+'마이샵 아이디가 넘어온 경우는 해당 샵을 보여준다.
+'아닌 경우는 내 마이샵을 보여주고, 로그인하지않은경우 오류메세지 표시한다.
+set my=new mySHop
+with my
+			.myshop_domain=myshop_domain
+			.user_id=session("user_id")
+			.pcs_id=pcs_id
+			.myPcs_id=myPcs_id
+end with
+set rs=my.shopMyshopInfo		
+	myshop_title=rs("myshop_title")
+	myshop_owner=rs("myshop_owner")
+	if ucase(myshop_owner)=ucase(session("user_id")) then myshopAdmin=true
+rs.Close
+set rs=Nothing
+
+sub myHeader()
+				%>
+				<div style="background-image:url('https://www.gvg.co.kr/dat2/043/Slide_PC%28NOMAIN%29-109.jpg');">
+					
+						<div class="profileImage" style="background-image:url('https://farm66.staticflickr.com/65535/53329064768_afa64bdaaf_b.jpg');">
+						</div>
+					
+				</div>
+				<%
+end sub	
+
+sub myPcsList(my)
+	with my
+		.myshop_domain=myshop_domain
+		.myshop_owner=myshop_owner
+		.myshop_root=myshop_root
+		.board_id=board_id
+	end with	
+	my.shopPcsList
+end sub	
+sub myBoard(my)
+		my.board_id=0
+		set rs=my.shopBoardList		
+			if not(rs.eof or rs.bof) then
+				%>
+				<ul>
+					<li><a href="<%=myshop_root%>" class="material-symbols-outlined s15">home</a></li>
+					<%
+					do until rs.EOF
+						%><li>
+							<a <%if clng(board_id)=clng(rs("board_id")) then response.write " style=""background-color:#333333;color:#ffffff;"" " %> href="?board=<%=rs("board_id")%>"><%=rs("board_title")%></a>
+						</li><%
+					rs.MoveNext
+					Loop
+				%></ul>
+				<%
+			end if	
+		rs.Close
+		set rs=Nothing
+	
+end sub
+%>
+<div id="mspContentContainer">
+	<%
+	if clng(myPcs_id)=0 then
+		%><div id="mspHeader"><%call myHeader()%></div><%
+	end if
+	%>
+	<div id="mspBoards"><%call myBoard(my)%></div>
+	<%if clng(myPcs_id)=0 then %>
+		<div class="mspPcsContainer"><%call myPcsList(my)%></div>
+	<%else%>
+		<div class="mspPcsContainer">
+			<%my.shopPcsInfo%>
+		</div>
+	<%end if	%>
+</div>
+<!--#include virtual=/myshop/inc/bottom.inc-->
