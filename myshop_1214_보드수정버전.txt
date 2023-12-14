@@ -1,0 +1,182 @@
+
+
+
+class myShop{
+    constructor(data) { // 생성자 호출
+        var myshop_id;
+        var board_title;
+        var board_id;
+        var pcs_ids;
+        var result;
+        var status;
+        
+        this.myshop_id = data.myshop_id;
+        this.board_title = data.board_title;
+        this.board_id = data.board_id;
+        this.pcs_ids = data.pcs_ids;
+        this.pcs_image = data.pcs_image;
+        this.pcs_name = data.pcs_name;
+        this.status = data.status;
+        this.modalContent='';
+
+    }
+
+	//마이샵에 아이템 추가시 팝업
+	OpenModal(){
+		$('#div_cover').fadeIn();
+		$('#div_popup').show();
+		$('#div_popup>div').html('');
+		$("#div_popup>div").html(this.modalContent);
+	}
+    //내 보드 목록 리턴 
+	getBoardList() {
+	    return $.ajax({ 
+	        type: "GET",
+	        url: "myshop/ajax/get_board_list.asp",
+            traditional:true,
+	        data: {'pcs_ids': [this.pcs_ids]},  
+	        dataType: "json"
+	    })
+	}
+
+	//새로운보드 만들어서 상품 넣기
+	// { "resp":"OK",  "pcs_count":1,  "resp_message":"ADDED SUCCESSFULLY",  "status":"ADD" }
+	setBoardInfo() {
+		// alert(this.board_id);
+		// alert(this.pcs_ids);
+		// alert(this.status);
+		    $.ajax({
+		        type: "GET",
+		        url: "/myshop/ajax/set_myshop_pcs.asp",
+		        data: {
+		            'board_id': this.board_id,
+		            'pcs_ids': this.pcs_ids,    
+		            'status': this.status,
+		            'board_title': this.board_title
+		        },
+		        success: function(item) {
+                    var data=JSON.parse(item)
+					if(data.resp==='OK'){
+						this.selectPcs()
+					}
+				},
+				error:function(response, textStatus, errorThrown){
+					alert(errorThrown);
+				}
+		    });
+	}
+
+	
+       //선택상품 보여주기
+       selectPcs(){
+        this.pcs_image=`//www.gvg.co.kr/dat2/043/p-23120712732_550.jpg`
+        this.pcs_name=` (뉴진스 하니) 버니 진주 반지`
+        this.board_id = 7;
+
+        var content=`
+            <div style="position:relative; width:250px; height:250px;">
+                <div class="psc_imge" style="background-image: url('${this.pcs_image}'); width: 250px; height: 250px; background-size: cover"></div>
+                <div>제품명${this.pcs_name}</div>  
+                <div>
+                    <a style="display: inline-block;" class="gotoBtn btn1 biggest">Go Myshop</a>
+                    <a style="display: inline-block;" class="closeBtn btn1 biggest">X</a>
+                </div>              
+            </div>
+            `;
+        //지금은 url board_id로 던지기
+        this.modalContent=content;
+       	this.OpenModal();
+        
+    }
+
+
+    //기존보드 보여주기
+    showBordList() {
+        this.getBoardList().done((result) => {
+            //alert(JSON.stringify(result))
+            var content = `
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <a class="testBtn">testBtn</a>
+                    <h2 style=" margin-bottom:15px;" id="myshop_title">${result.myshop_title} </h2>
+                        <div style="position:relative; width:250px; height:250px;">
+                            <div class="psc_imge" style="background-image: url('${result.pcs[0].pcs_image}'); width: 250px; height: 250px; background-size: cover"></div>
+                        <p style="margin-left: -25px; margin-bottom:15px; width:300px;">${result.pcs[0].pcs_name}</p>    
+                        <ul style="padding: 0; text-align: center;">
+                        ${
+                            result.board && result.board.length > 0 ? 
+                            result.board.map(board => `
+                                <li>
+                                    <h3>
+                                        <a board_id="${board.board_id}" class="board-title" onclick="setBoardInfo(${board.board_id}, ${this.pcs_ids}, 'ADD');">${board.board_title}</a>
+                                    </h3>
+                                </li>
+                            `).join('') : '<li>NO BOARD</li>'
+                        }
+                        </ul>   
+                        <div style="display: flex; align-items: center; justify-content: center;">   
+                            <input type="text" id="board_title" style="display: inline-block;">
+                            <a id="a_addToNew" class="btn1 biggest" style="display: inline-block;">+</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        this.modalContent=content;
+       	this.OpenModal();
+
+        }).fail((jqXHR, textStatus, errorThrown) => {
+            console.log(textStatus, errorThrown);
+        });
+    }
+ 
+
+}
+
+
+
+
+var ms = new myShop({});
+$(document).on('click', '.a_toggleMyshop', function () {
+    alert(1223)
+	// ms.pcs_ids=$(this).attr('pcs_id'),
+	// ms.showBordList();
+});
+
+$(document).on('click', '.board-title', function () {
+	ms.board_id=$(this).attr('board_id');
+	ms.board_title='';
+	ms.status='ADD';
+	ms.setBoardInfo();
+});
+
+$(document).on('click', '#a_addToNew', function () {
+	var board_title=$('#board_title').val();
+	if(board_title){
+		ms.board_id=0;
+		ms.board_title=board_title;
+		ms.status='ADD';
+		ms.setBoardInfo();
+	}else{
+		alert('no title');
+	}
+});
+$(document).on('click', '.testBtn', function () {
+    //넘겨주는 것 보드id, pcs_id
+    //ms.board_id=0;
+    ms.selectPcs()
+});
+
+$(document).on('click', '.gotoBtn', function () {
+    //넘겨주는 것 보드id, pcs_id
+    ms.board_id=7;
+    window.location.href = `http://bak2.gvg.co.kr/myshop/?board=${ms.board_id}`;   
+ });
+
+ $(document).on('click', '.closeBtn', function () {
+    $('#div_cover').hide();
+	$('#div_popup').hide();
+ });
+
+
+$(document).ready(function(){
+    $('head').append('<link rel="stylesheet" type="text/css" href="./css/popup.css">');
+});

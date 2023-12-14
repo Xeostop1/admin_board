@@ -1,0 +1,188 @@
+<!--#include virtual=/inc/vbutil.inc-->
+<!--#include virtual=/inc/aspJson.inc-->
+<!--#include virtual=/inc/Classes/myshop.asp-->
+<!--#include virtual=/inc/Classes/sqlJson.asp-->
+<!--#include virtual=/myshop/inc/top.inc-->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="../myshop.js"></script>
+<script>
+	//ready
+	//ms.myshop_id=123
+	//var result=ms.getMasterInfo();
+	//var result=selectMyshopInfo();
+	// JSON으로 받은 전문용해서 Input 에 넣어줌.
+	$(document).on('click','.editInput',function(){
+		$(this).prev().addClass('box3');
+	});
+	$(document).on('click','.mToggle',function(){
+		if($(this).text()=='toggle_off'){
+			$(this).text('toggle_on');
+			$(this).parent().addClass('inActive');
+		}else{
+			$(this).text('toggle_off');
+			$(this).parent().removeClass('inActive');
+		}
+		
+	});
+	$(document).on('change','.myColor',function(){
+		var obj=$(this).attr('obj');
+		var target=$(this).attr('target');
+		var color=$(this).val();
+		$(''+obj+'').css(target,color);
+	})
+
+
+    //====추가
+    $(document).on('click','#myshop_idSave, #myshop_DBdSave',function(){
+        alert(123)
+    });
+
+
+    //===추가 세팅 확인
+    function showMyshop(res) {
+            var myshop_id = $('#myshop_title');
+            myshop_id.val(res.myshop_title);    
+    }
+
+    
+    function showMyshopBd(res){
+        var container = $('.functionContainer.board_info');
+        container.empty(); 
+        res.board.forEach(board => {
+            var li = createLi(board);
+            container.append(li);
+        });
+        container.append(`<a id="myshop_DBdSave" class="btn2 biggest" onclick="showMyshopBd()">SAVE</a>`);
+    }
+    
+    function createLi(board) {
+        return `<li>
+            <input class="board_title" type="text" value="${board.board_title}">
+                <a class="material-symbols-outlined editInput">edit</a>
+                <a class="material-symbols-outlined s30 mToggle">toggle_off</a>                        
+                <br>
+                <textarea style="margin-bottom: 7px;" name="board_desc" class="board_desc" cols="19" rows="4">${board.board_desc}</textarea>
+        </li>
+        `;
+
+    }
+
+
+    var result;
+    function getMasterInfo(){
+        return $.ajax({ 
+            type: "GET",
+            url: "/myshop/ajax/get_myshop_info.asp",
+            dataType: "json",
+            success: function(result) {
+               result = result; 
+               showMyshop(result)
+               showMyshopBd(result)
+            },
+            error: function(response, textStatus, errorThrown) {
+                console.log(response.responseText);
+                alert(errorThrown);
+            }
+        });
+    }
+
+    getMasterInfo();
+    
+    //===추가
+    function submitForm(){
+        var data = $('form').serialize();
+        $.ajax({
+            type: "POST",
+            url: "set_myshop_up.asp",
+            data: data,
+            success: function(response) {  
+                console.log(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error(textStatus, errorThrown);
+            }
+        });
+    }
+
+    //$(document).ready(function(){
+    //    var ms=new myShop();
+
+	    //var res =getMasterInfo();
+       // console.log(res);
+        //alert(JSON.stringify(result))
+
+    //});
+    
+   
+</script>
+	<ul id="settingContainer">
+		<li class="menu">MENU</li>
+		<li class="body">
+            <form>
+                <div class="title">기본정보</div>
+                <ul class="functionContainer">
+                        <li class="label">마이샵 제목 &nbsp;
+                            <select name="myshop_lang" id="myshop_lang">
+                                <option value="KR">KR</option>
+                                <option value="US">US</option>
+                                <option value="ZH">ZH</option>
+                                <option value="JA">JA</option>
+                            </select>
+                            <select name="myshop_currency" id="myshop_currency">
+                                <option value="KRW">KRW</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </li> 
+                        <li><input id="myshop_title" type="text"></li>
+                        <!-- <li class="desc">제목은 뭐고 어떻게 넣어야되고 주절주절</li> -->
+                        <a id="myshop_idSave" class="btn2 biggest" onclick="showMyshop()" >SAVE</a>
+                        <br>
+                </ul>
+                <div class="title" >컬렉션 정보</div>
+                <ul class="functionContainer board_info">
+                        <li>
+                            <input class="board_title" type="text" value="Collection 1" >
+                            <a class="material-symbols-outlined editInput">edit</a>
+                            <a class="material-symbols-outlined s30 mToggle">toggle_off</a>                        
+                            <br>
+                            <textarea style="margin-bottom: 7px;" name="board_desc" class="board_desc" cols="19" rows="4">보드 설명해줘</textarea>
+                        </li>
+                        
+                        <li>
+                            <input class="board_title" type="text" value="Collection 2" >
+                            <a class="material-symbols-outlined editInput">edit</a>
+                            <a class="material-symbols-outlined s30 mToggle">toggle_off</a>  
+                            <br>                      
+                            <textarea style="margin-bottom: 7px;" name="board_desc" class="board_desc" cols="19" rows="4">보드 설명해줘요</textarea>
+                        </li>
+                        
+                        <li>
+                            <input class="board_title" type="text" value="Collection 3" >
+                            <a class="material-symbols-outlined editInput">edit</a>
+                            <a class="material-symbols-outlined s30 mToggle">toggle_off</a>    
+                            <br>                    
+                            <textarea style="margin-bottom: 7px;" name="board_desc" class="board_desc" cols="19" rows="4">보드 설명해주세요</textarea>
+                        </li>
+                        <!-- <li class="inActive"><input type="text" value="Collection 2" readonly></li>
+                        <li><input type="text" value="Collection 3" readonly></li>
+                        <li><input type="text" value="Collection 4" readonly></li>
+                        <li class="desc">제목은 뭐고 어떻게 넣어야되고 주절주절</li> -->
+                        <br>
+                        <a id="myshop_DBdSave" class="btn2 biggest" onclick="showMyshopBd()">SAVE</a>
+                </ul>
+                <br>
+                <div class="title">스타일</div>
+                <ul class="functionContainer">
+                        <li>background <input id="bg_color" type="color" value="#000033" class="myColor" obj="body" target="background-color"></li>
+                        <li>border <input id="border" type="color" value="#000000" class="myColor" obj="#mspContentContainer" target="border-color"></li>
+                        
+                </ul>
+            </form>    
+		</li>
+	</ul>
+</div>
+<%
+	
+set my=Nothing		
+%>
+<!--#include virtual=/myshop/inc/bottom.inc-->

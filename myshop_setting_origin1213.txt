@@ -1,0 +1,72 @@
+<!--#include virtual=/inc/vbutil.inc-->
+<!--#include virtual=/inc/aspJson.inc-->
+<!--#include virtual=/inc/Classes/myshop.asp-->
+<!--#include virtual=/inc/Classes/sqlJson.asp-->
+<!--#include virtual=/myshop/inc/top.inc-->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+	//ready
+	//ms.myshop_id=123
+	//var result=ms.getMasterInfo();
+	//var result=selectMyshopInfo();
+	// JSON으로 받은 전문용해서 Input 에 넣어줌.
+	$(document).on('click','.editInput',function(){
+		$(this).prev().addClass('box3');
+	});
+	$(document).on('click','.mToggle',function(){
+		if($(this).text()=='toggle_off'){
+			$(this).text('toggle_on');
+			$(this).parent().addClass('inActive');
+		}else{
+			$(this).text('toggle_off');
+			$(this).parent().removeClass('inActive');
+		}
+		
+	});
+	$(document).on('change','.myColor',function(){
+		var obj=$(this).attr('obj');
+		var target=$(this).attr('target');
+		var color=$(this).val();
+		$(''+obj+'').css(target,color);
+	})
+</script>
+	<ul id="settingContainer">
+		<li class="menu">MENU</li>
+		<li class="body">
+			
+			<div class="title">기본정보</div>
+			<ul class="functionContainer">
+					<li class="label">마이샵 제목</li>
+					<li><input type="text"></li>
+					<li class="desc">제목은 뭐고 어떻게 넣어야되고 주절주절</li>
+					
+			</ul>
+			
+			<div class="title">컬렉션 정보</div>
+			<ul class="functionContainer">
+					<li>
+						<input type="text" value="Collection 1" readonly>
+						<a class="material-symbols-outlined editInput">edit</a>
+						<a class="material-symbols-outlined s30 mToggle">toggle_off</a>
+					</li>
+					<li class="inActive"><input type="text" value="Collection 2" readonly></li>
+					<li><input type="text" value="Collection 3" readonly></li>
+					<li><input type="text" value="Collection 4" readonly></li>
+					<li class="desc">제목은 뭐고 어떻게 넣어야되고 주절주절</li>
+			</ul>
+			
+			<div class="title">스타일</div>
+			<ul class="functionContainer">
+					<li>background <input type="color" value="#000033" class="myColor" obj="body" target="background-color"></li>
+					<li>border <input type="color" value="#000000" class="myColor" obj="#mspContentContainer" target="border-color"></li>
+					
+			</ul>
+			
+		</li>
+	</ul>
+</div>
+<%
+	
+set my=Nothing		
+%>
+<!--#include virtual=/myshop/inc/bottom.inc-->
