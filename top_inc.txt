@@ -1,0 +1,147 @@
+<%
+dim myshop_title
+dim myshop_owner
+dim myshop_root
+dim myshop_language
+dim myshopAdmin
+dim myPcs_id
+myshopAdmin=false
+myshop_domain=request("id")	
+if myshop_domain="" then myshop_domain=request("myshop")	
+board_id=request("board")
+myPcs_id=request("myPcs_id")
+if board_id="" then board_id="0"
+if myPcs_id="" then myPcs_id="0"
+'도메인도 없고 세션도 없다면 로그인으로이동
+if myshop_domain="" and session("user_id")="" then 
+	response.redirect "/myshop/login"
+end if 	
+
+
+sql="GWU_GLOBAL_LANGUAGE "
+set languageset=getsp_by_conn(getconnection(),sql)
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:100,400,500,600,700&display=swap" rel="stylesheet" type="text/css" />
+	<link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:100,400,500,600,700&subset=korean" rel="stylesheet" type="text/css" />
+	<link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700&display=swap&subset=korean" rel="stylesheet" type="text/css" />
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700;900&display=swap" rel="stylesheet" type="text/css" />
+	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" type="text/css" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/css/master.css?ver=<%=now%>" type="text/css" />
+	<link rel="stylesheet" href="/css/master1000.css?ver=20230626" type="text/css" />
+	<link rel="stylesheet" href="/css/master640.css?ver=<%=now%>" type="text/css" />
+	<link rel="stylesheet" href="/css/master320.css?ver=20230626" type="text/css" />
+
+	<link rel="stylesheet" href="/myshop/css/master.css?ver=<%=now%>" type="text/css" />
+	<link rel="stylesheet" href="/myshop/css/popup.css?ver=<%=now%>" type="text/css" />
+	
+
+	<%
+	'====Masterslider 설정시 스타일 추가
+	if (masterslider) then
+	%><link rel="stylesheet" href="/css/masterslider.css" type="text/css">
+	<link rel="stylesheet" href="/css/default/style.css" type="text/css">
+	<link rel="stylesheet" href="/css/royalslider.css?ver=20220108" type="text/css" />
+	<link rel="stylesheet" href="/css/rs-default.css"><%
+	end if
+	
+'	if (addopengraph) then call opengraph()
+	%>
+	<link rel="stylesheet" href="/css/flutter.css?ver=20210104" type="text/css" />
+	<script src="/jquery/jquery.min.js"></script>
+	<script src="/jquery/master.js?ver=<%=now%>"></script><%
+		if (npay) then 
+		%>
+	<script type="text/javascript" src="https://pay.naver.com/customer/js/naverPayButton.js" charset="UTF-8"></script><%
+		end if	
+		if (addonscript) then call additionalScript()'추가적인 함수가 필요한경우 변수 선언해서 각각 파일에서정리된 스크립트를 헤더에 삽입
+	
+	'===네이버 / 로거  공통스크립트 / 페이스북 픽셀
+	%><!--include virtual=/inc/log_anal.inc-->
+	
+</head>
+<body language="<%=lcase(session("language_set"))%>" tip="<%=session("first_con")%>">
+	<div id="div_popup"><a class="a_close outside" href="javascript:void(0);"></a><div></div></div>
+	<div id="div_cover"></div>
+	<!-------------BEGIN OF TOP CONTAINER-------------->			
+	<div id="mspContainer">
+		<%
+			'마이샵 아이디가 넘어온 경우는 해당 샵을 보여준다.
+			'아닌 경우는 내 마이샵을 보여주고, 로그인하지않은경우 오류메세지 표시한다.
+	set my=new mySHop
+			with my
+						.myshop_domain=myshop_domain
+						.user_id=session("user_id")
+						.pcs_id=pcs_id
+						.board_id=board_id
+						.myPcs_id=myPcs_id
+			end with
+			set rs=my.shopMyshopInfo		
+				response.write "rs.recordCount : "&cstr(rs.recordCount)
+				if cstr(rs(0))<>"ERROR" then
+					myshop_title=rs("myshop_title")
+					myshop_id=rs("myshop_id")
+					myshop_owner=rs("myshop_owner")
+					myshopFav_Id=rs("fav_id")
+					myshop_language=rs("myshop_language")
+					board_title=rs("board_title")
+					myshop_status=rs("status")
+					if ucase(myshop_owner)=ucase(session("user_id")) then 
+						myshopAdmin=true
+						myshop_root="/myShop/"
+						myshop_status="ON"
+					else
+						myshop_root="/my/"&myshop_domain						
+					end if	
+				else
+					myshop_status="OFF"	
+				end if					
+			rs.Close
+			set rs=Nothing
+			if myshop_status="OFF" then response.redirect "/myshop/closed"
+		%>
+		<div id="mspHotmenu">
+				<ul>
+					<li>MY SHOP HOT MENU</li>
+					<li>
+						<div class="profileImage">p</div>
+					</li>
+				</ul>
+		</div>
+		<div id="mspTitle">
+				<ul id="ul_sharebuttons">
+					<li class="li_favorite" style="padding:0 10px 0 0;">
+						<a 
+							class="btn3 biggest <%if clng(myshopFav_Id)>0 then response.write "heart"%>" 
+							style="background-color:#ffffff;"
+							href="javascript:void(0);" 
+							myshop_id="<%=myshop_id%>"
+							onclick="ChangeFav(0,0,0,0,<%=myshop_id%>,0)"
+						>
+							
+						</a>
+					</li>
+					<li>
+						<h1>
+							<a href="<%=myshop_root%>">
+								<%=myshop_title%>
+								<%=myshop_id%>
+							</a>
+							<%
+							if myshopAdmin then
+								%><a href="/myshop/setting" class="material-symbols-outlined" style="color:#ffffff;">settings</a><%
+							end if	
+							%>
+						</h1>
+					</li>
+				</ul>
+		</div>
+		<div id="mspContentContainer">
