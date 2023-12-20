@@ -1,0 +1,82 @@
+showMasterInfo() {} 이 함수에서 
+
+Object { myshop_id: 22, myshop_title: "서하나님의 스토어", myshop_desc: "", myshop_domain: "hanatour", myshop_language: "jp", myshop_currency: "KRW", myshop_header: "", status: "ON", board: (17) […], pcs: [] }
+​
+board: Array(17) [ {…}, {…}, {…}, … ]
+​
+myshop_currency: "KRW"
+​
+myshop_desc: ""
+​
+myshop_domain: "hanatour"
+​
+myshop_header: ""
+​
+myshop_id: 22
+​
+myshop_language: "jp"
+​
+myshop_title: "서하나님의 스토어"
+​
+pcs: Array []
+​
+status: "ON"
+​
+<prototype>: Object { … }
+var data=this.getMasterInfo()
+
+나는 이런 데이터를 가지고 있는데, 
+이걸 활용해서 
+$('#myshop_title').val(data.myshop_title);
+이렇게 넣고 싶어 
+
+
+No problem. I told you because I felt like I was disturbing you because you got to work early.😉
+
+
+
+#mspHeader 안에있는 이 div에 
+<div style="background-image:url('');">
+&nbsp;<a class="btn3 small a_upload" >+</a>
+이 버튼을 클릭하면 변경하고 싶어 그러면 어떻게 하면 좋을까?
+
+
+
+ setBg(){
+        $('#imageFile').change(function() {
+            var file = this.files[0];
+            var reader = new FileReader();
+    
+            reader.onloadend = function() {
+                $('#mspHeader div').css('background-image', 'url(' + reader.result + ')');
+            }
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }) 
+    }
+
+
+이함수에 지금  $(document).on('click','.a_upload',function(){
+        
+    });
+이 클릭 이벤트가 없거든 그래서 어떻게 할까 고민중이야
+
+
+
+
+
+div class="profileImage" 여기는 변경되면 안돼 그것도 추가해줘 
+
+
+그리고 myshop_header에 지금 업로드한 파일명이 나왔으면 좋겠어 어떻게 하면 좋을까?
+
+
+혹시 제이쿼리에서 화면에 드래그 하면 바로 배경이미지가 되는 라이브러리나
+기능이 있어?
+
+
+#mspHeader
+
+
+이 코드가 그러면 내컴퓨터에 있는 파일을 html에 드래그 하면 배경화면이 들어가는거야?
