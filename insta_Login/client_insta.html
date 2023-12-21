@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>인스타그램 로그인하고 피드가지고 와요</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal_content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    #instaBtn {
+      cursor: pointer;
+    }
+  </style>
+
+  <body onload="checkLogin()">
+    <div class="modal">
+      <div class="modal_content">
+        <div class="close">X</div>
+      </div>
+    </div>
+    <table>
+      <th>인스타그램 연결하기</th>
+      <tr>
+        <td><a id="instaBtn">계정연결 ></a></td>
+      </tr>
+    </table>
+
+    <script>
+      var reslut;
+      var data;
+      var urlParams;
+
+      //===모달
+      function modal(data) {
+        $(".modal").css("display", "block");
+        $(".modal_content").append(data);
+        $(".close").click(function () {
+          $(".modal").css("display", "none");
+        });
+      }
+
+      //===인스타 요청
+      {
+        /* // function getInstaFeed() {
+      //      var url = `https://graph.instagram.com/me/media`;
+      //      var access_token = `IGQWRPeVYwUzBibkNZAMXNvZAjNWWTVyblRWQlMtdFljWndOaDZApenhsbGEtYnBtaE56dG1rSG8tNHlrMkFRSWZAjblBNLTA0NW5ITTRoTk5JLVJ0d3dnek9VSmR4a0VSWkZA5dFhlS2hzNm9lT3BQLTE3ZAFFCeU11NlUZD`;
+      //      var reslut;
+     //       $.ajax({
+      //          url: url,
+                type: "GET",
+                data: {
+                    fields:
+                        "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp",
+                    access_token: access_token,
+                },
+                dataType: "json",
+                success: function (response) {
+                    //console.log(response);
+                    reslut = response
+                    response.data.forEach(function (item) {
+                        console.log('Media ID:', item.id);
+                        console.log('Caption:', item.caption);
+                        console.log('Media Type:', item.media_type);
+                        console.log('Media URL:', item.media_url);
+                        console.log('Permalink:', item.permalink);
+                        console.log('Thumbnail URL:', item.thumbnail_url ? item.thumbnail_url : 'N/A');
+                        console.log('Timestamp:', item.timestamp);
+                    });
+                },
+                error: function (error) {
+                    console.error("Error fetching Instagram feed:", error);
+                },
+            });
+            return reslut;
+        } */
+      }
+
+      //인스타 로그인
+      function connectInsta() {
+        var clientId = "630028085815370";
+        var redirectUri = "https://8431-14-32-54-131.ngrok-free.app";
+        var scope = "user_profile,user_media";
+        var authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+          redirectUri
+        )}&scope=${scope}&response_type=code`;
+        window.open(authUrl, "InstagramLogin", "width=500,height=600");
+      }
+
+      function checkLogin() {
+        urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("code")) {
+          if (confirm("창을 닫으시겠습니까?")) {
+          }
+          getInstaFeed();
+        }
+      }
+
+      $(document).ready(function () {
+        $("#instaBtn").on("click", () => {
+          connectInsta();
+
+          //var data=getInstaFeed();
+        });
+      });
+    </script>
+  </body>
+</html>
