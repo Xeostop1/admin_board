@@ -4,27 +4,51 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>인스타그램 로그인하고 피드가지고 와요</title>
+    <title>여기 서버로 쓸꺼예요.index 지만</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+<style>
+    #media_display {
+        width: 1000px; 
+      }
+      .media_item {
+        float: left;
+        width: 18%; 
+        margin: 1%; 
+        box-sizing: border-box;
+      }
+       /* 왼쪽에 아무것도 없게 하여 라인 변경 */
+      .media_item:nth-child(5n+1) {
+        clear: both;
+      }
+      .media-container {
+        width: 100%; 
+        display: block; 
+        background-size: cover;
+        background-position: center;
+      }
+      video.media-container {
+        width: 100%; 
+        height: 200px;
+        object-fit: cover; 
+      }
+      .media-info {
+        text-align: center; 
+      }
+
+</style>
 
 <body>
-    <div class="modal">
-        <div class="modal_content">
-            <div class="close">X</div>
-        </div>
+    <button>로그아웃</button>
+    <div id="media_display">    
     </div>
-    <table>
-        <th>인스타그램 연결하기</th>
-        <tr>
-            <td><a id="instaBtn">계정연결 ></a></td>
-        </tr>
-    </table>
 
     <script>
-        var reslut;
+        var result;
         var data;
         var urlParams;
+
+    
 
         window.onload = function () {
             var urlParams = new URLSearchParams(window.location.search);
@@ -34,16 +58,17 @@
             }
 
         }
-
-
+        //var access_token = `IGQWRQVzhGR2RxMHZAla20zWmYzNXJyUm04U3VQUG9xSnl0U2hZAOVhmZAkpPVHRtSnFCTDFqVE9wbWN2ZAnNOSmJTUVIwRjlUb0xHMUROVUJsX0tyRDlnM1EzZAFlVMTB5YVZAqNHZAWWXNZAWEtSSjRNdXdmekxpLU94ZAUkZD`;
+        //test: IGQWRPeGVuc1F3X0Q3aFRCdU9uMG1YbUpBQXBLN29xS1VsVnoxZA0xqTXh6Mk5ZAQmg1OVRkZAXVQbi1NOS1hWk81ZAmVOemg2cXp0TVM1RTNnQW10d1Fsb3JpelpCR2xVVUVlUDY1YjNieFhRalhjVWNXbW1BYlVjWjQZD
         //===인스타 요청
         function getInstaFeed() {
             var url = `https://graph.instagram.com/me/media`;
-            var access_token = `IGQWRPeVYwUzBibkNZAMXNvZAjNWWTVyblRWQlMtdFljWndOaDZApenhsbGEtYnBtaE56dG1rSG8tNHlrMkFRSWZAjblBNLTA0NW5ITTRoTk5JLVJ0d3dnek9VSmR4a0VSWkZA5dFhlS2hzNm9lT3BQLTE3ZAFFCeU11NlUZD`;
-            var reslut;
+            var access_token = `IGQWRPeGVuc1F3X0Q3aFRCdU9uMG1YbUpBQXBLN29xS1VsVnoxZA0xqTXh6Mk5ZAQmg1OVRkZAXVQbi1NOS1hWk81ZAmVOemg2cXp0TVM1RTNnQW10d1Fsb3JpelpCR2xVVUVlUDY1YjNieFhRalhjVWNXbW1BYlVjWjQZD`;
+            //var reslut;
             $.ajax({
                 url: url,
                 type: "GET",
+                async:false,
                 data: {
                     fields:
                         "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp",
@@ -51,17 +76,8 @@
                 },
                 dataType: "json",
                 success: function (response) {
-                    //console.log(response);
-                    reslut = response
-                    response.data.forEach(function (item) {
-                        console.log('Media ID:', item.id);
-                        console.log('Caption:', item.caption);
-                        console.log('Media Type:', item.media_type);
-                        console.log('Media URL:', item.media_url);
-                        console.log('Permalink:', item.permalink);
-                        console.log('Thumbnail URL:', item.thumbnail_url ? item.thumbnail_url : 'N/A');
-                        console.log('Timestamp:', item.timestamp);
-                    });
+                    result = response
+                    showMedia()
                 },
                 error: function (error) {
                     console.error("Error fetching Instagram feed:", error);
@@ -70,16 +86,33 @@
             return reslut;
         }
 
-        //인스타 로그인
-        //  function connectInsta() {
-        //      var clientId = '630028085815370';
-        //      var redirectUri = 'https://8431-14-32-54-131.ngrok-free.app';
-        //      var scope = 'user_profile,user_media';
-        //      var authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
-        //      window.open(authUrl, 'InstagramLogin', 'width=500,height=600');
-        //      return authUrl;
-        //  }
+        function showMedia() {
+            $.each(result.data, function(i, item) {
+                var mediaItem = $('<div class="media_item"></div>'); 
+                var mediaContent;
+                if(item.media_type === 'VIDEO') {
+                  mediaContent = $(`
+                    <video class="media-container" controls autoplay muted loop>
+                      <source src="${item.media_url}" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  `);
+                } else {
+                  mediaContent = $(`
+                  <div class="media-container" style="background-image: url('${item.media_url}'); background-size: cover; background-position: center; height: 200px;"></div>
+                  `);
+                }
+                var captionText = item.caption && item.caption.length > 65 ? item.caption.substring(0, 65) + "..." : item.caption || "無";
+                var mediaInfo = $(`<div class="media-info"><p>ID: ${item.id}</p><p>${captionText}</p></div>`);
+            
+                mediaItem.append(mediaContent).append(mediaInfo);
+                $('#media_display').append(mediaItem);
+              });
+        }
 
+    
+
+        
     </script>
 </body>
 

@@ -75,10 +75,10 @@
       }
 
       //===인스타 요청
-      {
+      
         /* // function getInstaFeed() {
       //      var url = `https://graph.instagram.com/me/media`;
-      //      var access_token = `IGQWRPeVYwUzBibkNZAMXNvZAjNWWTVyblRWQlMtdFljWndOaDZApenhsbGEtYnBtaE56dG1rSG8tNHlrMkFRSWZAjblBNLTA0NW5ITTRoTk5JLVJ0d3dnek9VSmR4a0VSWkZA5dFhlS2hzNm9lT3BQLTE3ZAFFCeU11NlUZD`;
+      //      var access_token = `IGQWRQVzhGR2RxMHZAla20zWmYzNXJyUm04U3VQUG9xSnl0U2hZAOVhmZAkpPVHRtSnFCTDFqVE9wbWN2ZAnNOSmJTUVIwRjlUb0xHMUROVUJsX0tyRDlnM1EzZAFlVMTB5YVZAqNHZAWWXNZAWEtSSjRNdXdmekxpLU94ZAUkZD`;
       //      var reslut;
      //       $.ajax({
       //          url: url,
@@ -108,17 +108,17 @@
             });
             return reslut;
         } */
-      }
+
 
       //인스타 로그인
       function connectInsta() {
         var clientId = "630028085815370";
-        var redirectUri = "https://8431-14-32-54-131.ngrok-free.app";
+        var redirectUri = "https://a573-14-32-54-131.ngrok-free.app";
         var scope = "user_profile,user_media";
         var authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
           redirectUri
         )}&scope=${scope}&response_type=code`;
-        window.open(authUrl, "InstagramLogin", "width=500,height=600");
+        window.open(authUrl, "InstagramLogin");
       }
 
       function checkLogin() {
