@@ -1,0 +1,172 @@
+<!--#include virtual=/inc/vbutil.inc-->
+<!--#include virtual=/inc/aspJson.inc-->
+<!--#include virtual=/inc/Classes/myshop.asp-->
+<!--#include virtual=/inc/Classes/sqlJson.asp-->
+<!--#include virtual=/inc/top.inc-->
+<% 'myshopAdmin  현재 샵의 오너와 세션사용자가 일치할경우 true
+	' myshopFlag top.inc에서 gvg top / mushop_top 구분 if not(myshopAdmin) then response.redirect "/myshop/?shopId="
+   response.write myshopFlag 
+   call myHeader()
+%>
+<style>
+	div.title{
+		/*width:100%;*/
+		width:100%;
+		float: left;
+		padding-bottom: 20px;
+        margin-right: 10px; 
+	}
+	div.title:not(:first-child){
+		padding-top:50px;
+	}
+	.functionContainer li{
+		display:inline-block;	
+		padding:10px;
+		float: left;
+	}
+	.functionContainer li.label{
+		clear: left;
+		width:100px;
+	}
+	.functionContainer.board_info>li{
+		padding: 0;
+		width:100%;
+	}
+    #myshop_DBdSave{
+        margin-left: 265px;
+    }
+    #myshopTitle_Save{
+        margin-top: 15px;
+    }
+    div.title + div a {
+        display: inline-block;
+        margin-right: 10px; 
+    }
+    div[style="clear: both;"] {
+        text-align: center; 
+    }
+    div.settingBtn{
+        float: left; 
+        margin-left: 10px; 
+
+    }
+    .selected {
+        background-color: red; 
+        color: white; 
+    }
+
+</style>
+    <script>
+        //ready
+        //ms.myshop_id=22
+        //var result=selectMyshopInfo();
+        // JSON으로 받은 전문용해서 Input 에 넣어줌.
+        $(document).on('click', '.editInput', function () {
+            $(this).prev().addClass('box3');
+        });
+
+        $(document).on('click', '.mToggle', function () {
+            if ($(this).text() == 'toggle_off') {
+                $(this).text('toggle_on');
+                $(this).parent().addClass('inActive');
+                board_status = 'on';
+            } else {
+                $(this).text('toggle_off');
+                $(this).parent().removeClass('inActive');
+                board_status = 'off';
+            }
+        });
+
+        $(document).on('change', '.myColor', function () {
+            var obj = $(this).attr('obj');
+            var target = $(this).attr('target');
+            var color = $(this).val();
+            $('' + obj + '').css(target, color);
+        });
+
+        $(document).ready(function () {
+            var myResult;
+            myResult = ms.getMasterInfo();
+            ms.showMasterInfo();
+            ms.showBg();
+        });
+
+
+    </script>
+    <ul id="settingContainer">
+        <li class="menu">MENU</li>
+        <li class="body">
+            <form id="formMasterInfo" data-action="/myshop/ajax/set_myshop_info.asp">
+                <div class="title">기본정보</div>
+                <ul class="functionContainer">
+                    <li class="label">STATUS</li>
+                    <li>
+                    	<select>
+	                    	<option value="ON">ON</option>
+	                    	<option value="OFF">OFF</option>
+                    	</select>
+                    </li>                    
+                    <li class="label">마이샵타이틀</li>
+                    <li>
+                    	<input name="myshop_title" id="myshop_title" type="text" class="mustinput" title="title required">
+                        <input name="myshop_id" id="myshop_id" type="text">
+                    </li>
+                    
+                    <li class="label">언어 및 통화</li>
+                    <li>
+                        <select name="myshop_language" id="myshop_language">
+                            <option value="KR">KR</option>
+                            <option value="US">US</option>
+                            <option value="ZH">ZH</option>
+                            <option value="JA">JA</option>
+                        </select>
+                        <select name="myshop_currency" id="myshop_currency">
+                            <option value="KRW">KRW</option>
+                            <option value="USD" selected>USD</option>
+                        </select>
+                    </li>
+                    
+                    <li class="label">헤더이미지</li>
+                    <li>
+	                    <input name="myshop_header" id="myshop_header" type="text">
+                    	<input type="file" id="imageFile" style="display: none;">
+                          &nbsp;<a class="btn3 small a_upload">+</a>
+                          <!-- &nbsp;<a class="btn3 small a_upload" onclick="OpenUploader($(this).prev())" >+</a> -->
+                    </li>
+                    
+                    <li class="label">샵설명</li>
+                    <li>
+                    	<textarea name="myshop_desc" id="myshop_desc" ></textarea>
+                    </li>
+                    
+                    <li class="label">도메인</li>
+                    <li>
+                    	<input style="width: 246px;" name="myshop_domain" id="myshop_domain"type="text">
+                    </li>    
+                     <li style="clear: both;">
+                        <a id="myshop_DBdSave" class="btn2 biggest" onclick="ms.setMasterInfo($('#formMasterInfo'));">마이샵_저장</a>
+                    </li>
+            </ul>
+            </form>
+            
+            <div class="title">
+                <span style="float: left; margin-right: 10px;">컬렉션 정보</span>
+                <div  class="settingBtn">
+                    <a class="btn2 biggest" status="ON">ON</a>
+                    <a class="btn2 biggest" status="OFF">OFF</a>
+                    <a class="btn2 biggest" status="REMOVE">DEL</a>
+                </div>
+            </div>
+            <div>
+            <ul class="functionContainer board_info">
+                <li class="saveButton">
+                    <a style="margin-left: 235px;" id="myshopTitle_Save" class="btn2 biggest">보드타이틀_저장</a>
+                </li>
+            </ul>
+        
+        </li>
+        
+    </ul>
+    </div>
+    <% set my=Nothing %>
+        <!--#include virtual=/inc/bottom.inc-->

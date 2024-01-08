@@ -1,0 +1,431 @@
+class myShop {
+  constructor(data) {
+    // 생성자 호출
+    var myshop_id;
+    var board_title;
+    var board_id;
+    var board_desc;
+    var pcs_ids;
+    var pcs_image;
+    var pcs_name;
+    var result;
+    var status;
+    var checkedItems;
+    var selectedStatus;
+    var sortedItems;
+  
+    //var style;
+
+    this.myshop_id = data.myshop_id;
+    this.board_title = data.board_title;
+    this.board_id = data.board_id;
+    this.board_desc = data.board_desc;
+    this.pcs_ids = data.pcs_ids;
+    this.pcs_image = data.pcs_image;
+    this.pcs_name = data.pcs_name;
+    this.status = data.status;
+    //this.style = data.style;
+    this.modalContent = "";
+    this.checkedItems=[]; 
+    this.selectedStatus="";
+    this.sortedItems=[];
+  }
+
+  //보낼때: 마이샵_id/  {board_id/ title/ des}, style, status,
+  //des이 텍스트에리어
+  getMasterInfo() {
+    var result;
+    $.ajax({
+      type: "GET",
+      url: "/myshop/ajax/get_myshop_info.asp",
+      dataType: "json",
+      async: false,
+      success: function (data) {
+        result = data;
+        this.result = data;
+        //window.location.href = `http://bak2.gvg.co.kr/myshop/?board=${this.board_id}&shopId=${this.shopId}`;
+      },
+      error: function (response, textStatus, errorThrown) {
+        console.log(response.responseText);
+      },
+    });
+    return result;
+  }
+
+  //======타이틀 정렬 배열로 넘기기() +마이샵 id
+//   sortTitles(){
+//     //진짜 배열처럼 사용하려고 get() 사용 map은 객체를 리턴
+//     this.sortedItems = $('.functionContainer.board_info.ui-sortable > li').map(function() {
+//       return $(this).attr('board_id');
+//   }).get();
+//   //return sortedItems;
+
+// } 
+
+//"{ "resp":"OK", "resp_message":"UPDATE SUCCESS" }"
+//=========set 보드 정보=========
+  setMasterBdInfo(){
+	var _myshop_id=this.myshop_id;
+    $('.functionContainer.board_info.ui-sortable > li:not(.saveButton)').each(function(i) {
+      var li = $(this);
+      var curStatus=''
+      var checkbox =li.find('.boardCbox');    
+        if(checkbox.is(':checked')){    
+            console.log(li.name="status".val());
+        }
+        
+      $.ajax({
+        type: "post",
+        url: "/myshop/ajax/set_board_info.asp",
+        beforeSend:function(){
+            //console.log("curStatus: ",curStatus);
+        },
+        data: {
+          myshop_id: _myshop_id, 
+          board_id: li.attr('board_id'),
+          board_title: li.find('input[name="board_title"]').val(),
+          board_desc: "", 
+          sort: i, 
+          status: curStatus
+        },
+        dataType: "json",
+        context: this,
+        success: function (data) {
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.error("Error: " + errorThrown);
+        }
+      });
+    });
+    //$('.boardCbox').prop('checked', false);
+  }
+    
+
+  //마이샵 업데이트 폼 통채로 보내기
+  //"{ "resp":"OK",  "resp_obj":"",  "resp_message":"UPDATE SUCCESS" }"
+  setMasterInfo(form) {
+    if (fnPreSubmit(form)) {
+       var result = AjaxForm(form);
+       result=JSON.parse(result)
+       if(result.resp==='OK') alert(result.resp_message);
+     }
+  }
+
+
+  //마이샵 전체 보여주기(확인 완료)
+  showMasterInfo() {
+    var data = this.getMasterInfo();
+    //val()해당필드에 값 넣어주기
+    $("#myshop_language").val(data.myshop_language || 'KR');
+    $("#myshop_currency").val(data.myshop_currency || 'KRW');
+    $("#myshop_title").val(data.myshop_title);
+    $("#myshop_header").val(data.myshop_header);	  
+    $("#myshop_id").val(data.myshop_id);	  
+    $("#myshop_domain").val(data.myshop_domain);	  
+    $("#myshop_header").val(data.myshop_header);	  
+    this.myshop_id=data.myshop_id;
+    this.selectedStatus=data.selectedStatus;
+    //보드타이틀
+    var content = "";
+    content+=`<button style="float: left;" id="toggleAllCheck" class="btn2">√</button>`;
+    data.board.forEach(function (data, i) {
+      var style = data.status === 'OFF' ? 'style="background-color: gray; color: white;"' : '';
+      style = data.status === 'ON' ? 'style="background-color: #f2f7ff; color: black;"' : style;
+      content += `
+        <li board_id="${data.board_id}">
+          <input type="checkbox" class="boardCbox" style="margin-right: 5px; display:none">
+          <input name="status" type="hidden" value="${data.status}">
+          <input name="board_title" class="board_title" type="text" value="${data.board_title}" ${style}>
+          <a class="material-symbols-outlined">reorder</a>	
+        </li>
+      `;
+    });
+    $(".functionContainer.board_info").prepend(content);
+    $(".functionContainer.board_info").sortable();
+    $('#toggleAllCheck').on('click', function() {
+        $('.boardCbox').prop('checked', false);
+        $('.boardCbox').each(function (i) {
+            if(i<3) this.checked = true;
+            //this.checked = !this.checked;
+        });
+      });
+  }
+
+
+  //===배경이미지 세팅====
+  showBg() {
+    $(document).on("click", ".a_upload", function () {
+      $("#imageFile").click();
+    });
+    $("#imageFile").change(function () {
+      var file = this.files[0];
+      var reader = new FileReader();
+      reader.onloadend = function () {
+        $("#mspHeader div:not(.profileImage)").css(
+          "background-image",
+          "url(" + reader.result + ")"
+        );
+        $("#fileName").text(file.name);
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    });
+    var target = $("#mspHeader");
+    target.on("dragover", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    target.on("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      //드롭파일
+      var file = e.originalEvent.dataTransfer.files[0];
+      var reader = new FileReader();
+
+      reader.onloadend = function () {
+        $("#mspHeader div:not(.profileImage)").css(
+          "background-image",
+          "url(" + reader.result + ")"
+        );
+      //   $("#myshop_header").val(file.name);
+      $("#fileName").text(file.name);
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  //첫 화면 내 보드 목록 리턴
+  getBoardList() {
+    return $.ajax({
+      type: "GET",
+      url: "/myshop/ajax/get_board_list.asp",
+      traditional: true,
+      data: { pcs_ids: [this.pcs_ids] },
+      dataType: "json",
+    }).done((result) => {
+      this.pcs_image = result.pcs[0].pcs_image;
+      this.pcs_name = result.pcs[0].pcs_name;
+    });
+  }
+
+
+  //새로운 컬랙션 만들어서 상품 넣기
+  // { "resp":"OK",  "pcs_count":1,  "resp_message":"ADDED SUCCESSFULLY",  "status":"ADD" }
+  setBoardInfo() {
+    if (!this.pcs_ids || this.pcs_ids === "") {
+      alert("선택된 항목이 없습니다.");
+      return;
+    }
+    $.ajax({
+      type: "GET",
+      url: "/myshop/ajax/set_myshop_pcs.asp",
+      data: {
+        board_id: this.board_id,
+        pcs_ids: this.pcs_ids,
+        status: this.status,
+        board_title: this.board_title,
+      },
+      context: this,
+      success: function (item) {
+        var data = JSON.parse(item);
+        if (data.resp === "OK") {
+          switch (data.status) {
+            case "ADD":
+              if (this.status === "ADD" && this.board_id === 0) {
+                this.board_id = this.NewBoardId();
+              }
+              this.selectPcs();
+              break;
+            case "ON":
+              $(".mspPcsList>li.selected").removeClass("inActive");
+              break;
+            case "OFF":
+              $(".mspPcsList>li.selected").addClass("inActive");
+              break;
+            case "REMOVE":
+              if (
+                confirm(
+                  `${this.pcs_ids.split(",").length}개 항목을 삭제하시겠습니까?`
+                )
+              ) {
+                $(".mspPcsList>li.selected").remove();
+              }
+              break;
+            default:
+              console.log("resp_message:", data.resp_message);
+          }
+        } else {
+          alert("Error: " + data.resp_message);
+        }
+      },
+      error: function (response, textStatus, errorThrown) {
+        alert(errorThrown);
+      },
+    });
+  }
+
+  //첫화면 마이샵에 아이템 추가 팝업
+  OpenModal() {
+    $("#div_popup").css({
+      display: "flex",
+      "align-items": "center",
+      "justify-content": "center",
+    });
+    $(".a_close.outside").css({
+      position: "absolute",
+      top: "85",
+      right: "160",
+    });
+    $("#div_popup>div").css({
+      "border-radius": "9",
+    });
+    $("#div_cover").fadeIn();
+    $("#div_popup").show();
+    $("#div_popup>div").html("");
+    $("#div_popup>div").html(this.modalContent);
+  }
+
+  //====선택상품 보여주기======
+  selectPcs() {
+    var content = `
+            <div style="margin: 8px 12px 98px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 200px; position:relative; width:200px;">
+                <div style="position:relative; width:150px; height:150px;">
+                    <div class="psc_imge" style="background-image: url('${this.pcs_image}'); width: 150px; height: 150px; background-size: cover"></div>
+                    <p style="margin-left:-5px; margin-bottom:15px; margin-top:5px; word-wrap: break-word;">${this.pcs_name}</p>   
+                <div style="margin-bottom:15px;">
+                    <a style="display: inline-block;" class="gotoBtn btn1 biggest">Go Myshop</a>&nbsp
+                    <a style="display: inline-block;" class="closeBtn btn1 biggest">X</a>
+                </div>              
+            </div>
+                `;
+    this.modalContent = content;
+    this.OpenModal();
+  }
+
+  //====기존보드 보여주기 ***data-> board 로 변경=====
+  showBordList() {
+    this.getBoardList()
+      .done((data) => {
+        var content = `
+                <div style="margin: 12px 18px 98px 24px; display: flex; flex-direction: column; align-items: center; padding-left: 23px; padding-right: 17px;">
+                    <h2 style=" margin-bottom:8px;" id="myshop_title">${
+                      data.myshop_title
+                    } </h2>
+                        <div style="position:relative; width:150px; height:150px;">
+                            <div class="psc_imge" style="background-image: url('${
+                              data.pcs[0].pcs_image
+                            }'); width: 150px; height: 150px; background-size: cover"></div>
+                        <p style="width:160px; margin-left: -15px; margin-top: 6px; margin-bottom:14px; word-wrap: break-word; ">${
+                          data.pcs[0].pcs_name
+                        }</p>    
+                        <ul class="board_list" style="padding: 0; text-align: left;">
+                        ${
+                          data.board && data.board.length > 0
+                            ? data.board
+                                .map(
+                                  (board) => `
+                                <li>
+                                    <h3>
+                                        <a style="font-size:15px;" board_id="${board.board_id}" class="board-title" onclick="setBoardInfo(${board.board_id}, ${this.pcs_ids}, 'ADD');">${board.board_title}</a>
+                                    </h3>
+                                </li>
+                            `
+                                )
+                                .join("")
+                            : "<li>NO BOARD</li>"
+                        }
+                        </ul>   
+                        <div style="padding-bottom:20px; display: flex; margin-bottom:10px; align-items: center; justify-content: center;">   
+                            <input type="text" id="board_title" style="display: inline-block;">
+                            <a id="a_addToNew" class="btn1 biggest" style="display: inline-block;">+</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        this.modalContent = content;
+        this.OpenModal();
+      })
+      .fail((jqXHR, textStatus, errorThrown) => {
+        console.log(textStatus, errorThrown);
+      });
+  }
+
+  //안될것 같아ㅜ 나중에 수정하기
+  NewBoardId() {
+    var lastBoardId = $("ul.board_list a.board-title:last").attr("board_id");
+    return lastBoardId ? parseInt(lastBoardId) + 1 : 0;
+  }
+
+} //endC
+
+var ms = new myShop({});
+$(document).on("click", ".a_toggleMyshop", function () {
+  (ms.pcs_ids = $(this).attr("pcs_id")), ms.showBordList();
+});
+
+$(document).on("click", ".board-title", function () {
+  ms.board_id = $(this).attr("board_id");
+  ms.board_title = "";
+  ms.status = "ADD";
+  ms.setBoardInfo();
+});
+
+//.a_ManagePcs on/off/ remove(staus value)
+// .mspPcsList>li.selected   attr('pcs_id')[arry] request/response
+$(document).on("click", ".a_ManagePcs", function () {
+  ms.pcs_ids = $(".mspPcsList>li.selected")
+    .map(function () {
+      return $(this).attr("pcs_id");
+    })
+    .get()
+    .join(",");
+  ms.board_id = $(this).attr("board_id");
+  ms.status = $(this).attr("status");
+  ms.board_title = "";
+  ms.setBoardInfo();
+});
+
+$(document).on("click", "#a_addToNew", function () {
+  var board_title = $("#board_title").val();
+  if (board_title) {
+    ms.board_id = 0;
+    ms.board_title = board_title;
+    ms.status = "ADD";
+    ms.setBoardInfo();
+  } else {
+    alert("no title");
+  }
+});
+
+$(document).on("click", ".gotoBtn", function () {
+  //넘겨주는 것 보드id, 여기 꼭 수정
+   //ms.board_id
+   var item=ms.getMasterInfo()
+   window.location.href = `http://bak2.gvg.co.kr/myshop/?board=${ms.board_id}&shopId=${item.board[0].myshop_id}`;
+  
+});
+
+$(document).on("click", ".closeBtn", function () {
+  $("#div_cover").hide();
+  $("#div_popup").hide();
+});
+
+$(document).on('click', '.settingBtn .btn2.biggest:not(.checkSelect)',function() {
+  $('.btn2.biggest').removeClass('selected');
+  $(this).addClass('selected');
+  ms.selectedStatus = $(this).attr('status');
+  alert(ms.selectedStatus);
+  ms.setMasterBdInfo();
+});
+
+$(document).on("click", "#myshopTitle_Save", function () {
+  // ms.getCheckedItems();
+  ms.setMasterBdInfo();
+});
+
+$(document).on("click", ".checkSelect", function () {
+  $('.boardCbox').toggle();
+});
