@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <title>Myshop</title>
+    <style>
+        #myDiv {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 1px solid red;
+          }
+          
+          #overlay {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 0;
+            height: 100%; 
+            background: linear-gradient(to right,rgb(253, 225, 238), rgb(145, 11, 145)); 
+            transition: width 2s;
+          }
+          .hidden {
+            display: none;
+          }
+          #message{
+            width: 428;
+            height: auto;
+            border: 1px solid rgb(225 225 225);
+          }          
+    </style>
+</head>
+<body>
+    <div id="myDiv">
+        원래화면
+    </div>
+    <div id="overlay"></div>
+    <div id="message" class="hidden">뭐가 필요한가요??</div>
+    <br><br><br><br><br><br>
+    <button id="myButton">클릭</button>
+</body>
+<script>
+  /*  $(document).ready(function() {
+        $('#myButton').click(function() {
+            var overlay = $('#overlay');
+            overlay.show(); 
+            overlay.removeClass('hidden');
+            setTimeout(function() {
+                overlay.css('width', '100%');
+            }, 0);
+        });
+    }); */
+
+    $(document).ready(function() {
+        $('#myButton').click(function() {
+            var overlay = $('#overlay');
+            overlay.show();
+            setTimeout(function() {
+                overlay.css('width', '100%');
+            }, 0);
+            setTimeout(function() {
+                overlay.css('width', '0');
+            }, 3000); 
+            setTimeout(function() {
+                overlay.hide();
+                $('#myDiv').hide();
+                $('#message').show(); 
+            }, 5000); 
+        });
+    });
+
+</script>
+</html>
