@@ -63,7 +63,7 @@
         //===인스타 요청
         function getInstaFeed() {
             var url = `https://graph.instagram.com/me/media`;
-            var access_token = `IGQWRQcXoweVh6Mkw3Ty1pclppczR2MTJwNXZABdElseFhBNGtmV2hVN2t5TDFVQUY0LUZAqLXhBdDZAUdTFvZAzkwQnR2bldfWTN4MkRQZA2hUUENjVlNIelF6UG9fT0E0ZADNzTjBiY1lCQ1dSNWFibUw0UDBtSmJ0QVUZD`;
+            var access_token = `IGQWROaTVEdVQ1aE1mTE9BZA0hqejN3eldHVWNsMzBXQ2ZAHVjF4RmVSUktQanRZAckRucV8xeV9fNnNzVkFpN2Q1a2t5aFphUUNoNUpNQllpTFppTTFtRXZAQVXpfNTJhc1pGQjhXZAHlVdTNPc2xIVHk5MzJ6Y3ctVzgZD`;
             //var reslut;
             $.ajax({
                 url: url,
@@ -77,6 +77,7 @@
                 dataType: "json",
                 success: function (response) {
                     result = response
+                    console.log(result)
                     showMedia()
                 },
                 error: function (error) {

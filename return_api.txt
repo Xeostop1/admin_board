@@ -1,0 +1,103 @@
+<!--#include virtual=/inc/vbutil.inc-->
+<!--#include virtual=/inc/top.inc-->
+<!--#include virtual=/inc/aspJson.inc-->
+<!--#include virtual=/inc/Classes/cUrl.asp-->
+<%
+set myCurl=new cURL
+' 	public url required
+' 	public myQuery
+' 	public QueryType '미지정수 PalinText (JSON지정가능)
+' 	public method '미지정시 POST
+' 	public Authorization
+' 	public ContentType '미지정시 "application/x-www-form-urlencoded;charset=UTF-8"
+
+	'Error 
+	' 80072ee7 : 잘못된 URL 
+
+	'----------------------------------------------------
+	'-------------API REQUEST PARAMETERS-----------------------
+	'----------------------------------------------------
+
+	'쿼리 형식이 JSON인경우 value의 형식에 따라 선언할 수 있음
+	
+	'1: Array value 
+	itemCount=2 '원소갯수선언, 정확하지 않을경우 무시해도 무방
+	Dim myItems() '수정x
+	ReDim myItems(itemCount-1) '수정x
+	'배열의 원소가 Map인경우 mySub 선언하고 루프뒤에 CLose
+	set mySub=Server.CreateObject("Scripting.Dictionary")	
+	
+		for k=0 to cint(itemCount-1) 'cint(itemCount-1)를 원소의 갯수-1만큼 루프
+			'배열의 원소가 Map 인경우 선언한 mySub에 Key,Value 삽입
+			if cint(k) =0 then
+				mySub.add "Personal","Good"
+				mySub.add "Hair","blond"
+				mySub.add "height","180"
+			elseif cint(k) =1 then
+				mySub.add "Personal","BAD"
+				mySub.add "Hair","Black"
+				mySub.add "height","140"	
+			end if
+			'-----------------------------------
+			'원소가 String 일경우는 그대로 선언
+			'myItems(k)="myString"
+			'-----------------------------------
+			
+			'배열에 추가
+			myItems(k)=myCurl.JsonMap(mySub)
+			mySub.removeAll
+		
+	next	
+	set mySub=Nothing
+
+	'2. Map value
+	' 객체명은 자유롭게하되 Call한 후에 Close(nothing) 처리
+	set myUser=Server.CreateObject("Scripting.Dictionary")
+		With myUser
+			.add "name","고길동"
+			.add "gender","남성"
+			.add "address","양재동 119-2"
+		end With	
+	'--------------------------------------
+	'3. String 인경우 그대로 적어줍니다.
+	'ex) .myQuery.add "myKey","myStringValue"
+			
+	with myCurl
+		'.url="/api/deliveries/shipping/return"
+		.url="https://gapi.gvg.co.kr:446/common/category/"
+		'위에서 준비된 Paramater를 차례대로 맵변수에 입력해줍니다.
+		.myQuery.add "user_id","123123123"
+		.myQuery.add "token","cweljrhbwejrb"
+		.myQuery.add "user_detail",myUser
+		.myQuery.add "items",myItems
+		
+		.QueryType="JSON" 'Map이나 Array로 작성한경우 반드시 추가
+		
+	end With	
+	'----------------------------------------------------
+	'-------------API CALL 실행-----------------------
+	'----------------------------------------------------
+	'결과값 변수지정
+	myResult=myCurl.Result
+	'response.write myResult
+
+	'----------------------------------------------------
+	'-------------응답값 Parsing-----------------------
+	'----------------------------------------------------	
+	'response.write hello
+	'결과값JSON 로딩
+	set myJson=new aspJson
+		myJson.loadJson(myResult)
+		'JSON PARSING EXAMPLE
+		'1: value 가 상수일 경우 myJson.item("키")
+		'2: value 가 MAP일 경우 myJson.item("키")("키")
+		'3: value 가 ARRAY일 경우 myJson.item("키")("키")
+	' 		For each my in myJson.data("키")
+	' 			Set this = myJson.data("키").item(my)
+	' 			response.write this.item("키")
+	' 		Next					
+	set myUser=nothing
+	set myJson=Nothing
+set myCurl=Nothing
+%>
+<!--#include virtual=/inc/bottom.inc-->
