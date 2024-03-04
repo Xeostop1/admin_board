@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G in Shop from GVG</title>
+    <link rel="stylesheet" href="fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <!-- https://fonts.google.com/ -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+    <div class="tm-container">
+        <div class="tm-row">
+            <!-- Site Header _ edit/hnS-->
+
+            <div class="tm-left">
+                <div class="tm-left-inner">
+                    <!-- <div class="tm-site-header">
+                        <!-- 왼쪽 로고 
+                        <i class="fas fa-coffee fa-3x tm-site-logo"></i>
+                        <a href="http://bak2.gvg.co.kr/">
+                            <h1 class="tm-site-name">GVG</h1>
+                        </a>
+                    </div> -->
+                    <nav class="tm-site-nav">
+                        <ul class="tm-site-nav-ul">
+                            <!-- <li class="tm-page-nav-item">
+                <a href="#drink" class="tm-page-link active">
+                <!-- 폰트 수정삭제
+                  <i class="fas fa-mug-hot tm-page-link-icon"></i>
+                  <span>Drink Menu</span>
+                </a>
+              </li>
+              <li class="tm-page-nav-item">
+                <a href="#about" class="tm-page-link">
+                  <i class="fas fa-users tm-page-link-icon"></i>
+                  <span>About Us</span>
+                </a>
+              </li>
+              <li class="tm-page-nav-item">
+                <a href="#special" class="tm-page-link">
+                  <i class="fas fa-glass-martini tm-page-link-icon"></i>
+                  <span>Special Items</span>
+                </a>
+              </li>
+              <li class="tm-page-nav-item">
+                <a href="#contact" class="tm-page-link">
+                  <i class="fas fa-comments tm-page-link-icon"></i>
+                  <span>Contact</span>
+                </a>
+              </li> -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="tm-right">
+                <main class="tm-main">
+                    <div id="board_item" class="tm-page-content">
+                        <!-- 보드 아이템 페이지(전체) -->
+                        <nav class="tm-black-bg tm-drinks-nav">
+                            <div id="header">
+                                <div class="menubar">
+                                    <a href=""><span class="material-icons-outlined">menu</span></a>
+                                </div>
+                                <div class="shopname">
+                                    <a href="">SHOPNAME</a>
+                                </div>
+                                <div class="default_hearder">
+                                    <a href=""><img
+                                            src="https://ugc.production.linktr.ee/sP84bZNnRSZOyPiAXbnF_gvg_meta_logo.jpg?io=true&size=thumbnail-stack-v1_0"
+                                            alt="icon_shop"></a>
+                                    <a href=""><span class="material-icons-outlined">shopping_cart</span></a>
+                                </div>
+
+                                <div class="shop_bg">
+                                    <div class="sns_share">
+                                        <a href="">
+                                            <!-- material-icons-outlined 변경 -->
+                                            <div class="insta">insta</div>
+                                        </a>
+                                        <a href="">
+                                            <span class="material-icons-outlined">share</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </nav>
+
+                        <div id="board_wrap" class="tm-tab-content">
+                            <div class="tm-list">
+                                <div class="tm-list-item">
+                                    <div id="main_propfile" class="tm-page-content">
+                                        <div class="tm-mb-20 tm-about-box-1">
+                                            <div class="profile_warp">
+                                                <div class="profile">
+                                                    <div></div>
+                                                    <div class="myring">
+                                                        <a href="">
+                                                            <div class="myring_display"></div>
+                                                        </a>
+                                                        <a href="">
+                                                            <div class="profile_img"></div>
+                                                        </a>
+                                                    </div>
+
+                                                </div>
+                                                <div class="myshop_propfile">
+                                                    <p>사용자 이름</p>
+                                                    <p>프로필 문구</p>
+                                                </div>
+                                            </div>
+                                            <div class="widget">
+                                                <div class="widget_icon">
+                                                    <a href="">
+                                                        <div class="like_w">좋아요</div>
+                                                    </a>
+                                                    <a href="">
+                                                        <div class="myring_w">마이링</div>
+                                                    </a>
+                                                    <a href="">
+                                                        <div class="stars">별점</div>
+                                                    </a>
+                                                </div>
+                                                <div class="widget_counter">
+                                                    <p>20</p>
+                                                    <p>75/100</p>
+                                                    <p>4.2/5</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <footer class="tm-site-footer">
+                    <p class="tm-black-bg tm-footer-text">Copyright GVG
+                </footer>
+            </div>
+
+            <!-- Background video -->
+            <div class="tm-video-wrapper">
+                <!-- <i id="tm-video-control-button" class="fas fa-pause"></i> -->
+                <video autoplay muted loop id="tm-video">
+                    <source src="./assets/images/wave-video-bg.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <script src="js/jquery-3.4.1.min.js"></script>
+            <script>
+
+                function setVideoSize() {
+                    const vidWidth = 1920;
+                    const vidHeight = 1080;
+                    const windowWidth = window.innerWidth;
+                    const windowHeight = window.innerHeight;
+                    const tempVidWidth = windowHeight * vidWidth / vidHeight;
+                    const tempVidHeight = windowWidth * vidHeight / vidWidth;
+                    const newVidWidth = tempVidWidth > windowWidth ? tempVidWidth : windowWidth;
+                    const newVidHeight = tempVidHeight > windowHeight ? tempVidHeight : windowHeight;
+                    const tmVideo = $('#tm-video');
+
+                    tmVideo.css('width', newVidWidth);
+                    tmVideo.css('height', newVidHeight);
+                }
+
+                function openTab(evt, id) {
+                    $('.tm-tab-content').hide();
+                    $('#' + id).show();
+                    $('.tm-tab-link').removeClass('active');
+                    $(evt.currentTarget).addClass('active');
+                }
+
+                function initPage() {
+                    let pageId = location.hash;
+
+                    if (pageId) {
+                        highlightMenu($(`.tm-page-link[href^="${pageId}"]`));
+                        showPage($(pageId));
+                    }
+                    else {
+                        pageId = $('.tm-page-link.active').attr('href');
+                        showPage($(pageId));
+                    }
+                }
+
+                function highlightMenu(menuItem) {
+                    $('.tm-page-link').removeClass('active');
+                    menuItem.addClass('active');
+                }
+
+                function showPage(page) {
+                    $('.tm-page-content').hide();
+                    page.show();
+                }
+
+                $(document).ready(function () {
+
+                    /***************** Pages *****************/
+
+                    initPage();
+
+                    $('.tm-page-link').click(function (event) {
+
+                        if (window.innerWidth > 991) {
+                            event.preventDefault();
+                        }
+
+                        highlightMenu($(event.currentTarget));
+                        showPage($(event.currentTarget.hash));
+                    });
+
+
+                    /***************** Tabs *******************/
+
+                    $('.tm-tab-link').on('click', e => {
+                        e.preventDefault();
+                        openTab(e, $(e.target).data('id'));
+                    });
+
+                    $('.tm-tab-link.active').click(); // Open default tab
+
+
+                    /************** Video background *********/
+
+                    setVideoSize();
+
+                    // Set video background size based on window size
+                    let timeout;
+                    window.onresize = function () {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(setVideoSize, 100);
+                    };
+
+                    // Play/Pause button for video background      
+                    const btn = $("#tm-video-control-button");
+
+                    btn.on("click", function (e) {
+                        const video = document.getElementById("tm-video");
+                        $(this).removeClass();
+
+                        if (video.paused) {
+                            video.play();
+                            $(this).addClass("fas fa-pause");
+                        } else {
+                            video.pause();
+                            $(this).addClass("fas fa-play");
+                        }
+                    });
+                });
+
+            </script>
+</body>
+
+</html>
